@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>CloudV IDE</title>
+    	<script src="./js/splitter/split.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="./ace/ace.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="./ace/mode-verilog.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="./ace/theme-textmate.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="./ace/theme-github.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="./ace/theme-merbivore.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="./ace/theme-crimson_editor.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="./ace/ext-language_tools.js" type="text/javascript" charset="UTF-8"></script>
+        <!--link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'-->
+        <link rel="stylesheet" type="text/css" href="./stylesheets/animate.css"/>
+        <link rel="stylesheet" type="text/css" href="./stylesheets/font-awesome/css/font-awesome.min.css"/>
+        <link rel="stylesheet" type="text/css" href="./jqueryui/jquery-ui.css">
+        <link rel="stylesheet" type="text/css" href="./jqueryui/jquery-ui.theme.css">
+        <!-- <link rel="stylesheet" type="text/css" href="./js/jstree/themes/default/style.css"> -->
+        <link rel="stylesheet" type="text/css" href="./js/jstree/themes/default-dark/style.css">
+        <link rel="stylesheet" type="text/css" href="./stylesheets/ide.css"/>
+
+    </head>
+    <body>
+            <div id="ide" class="ide-body">
+                <div id="files-editors-logs">
+                    <div id="files" class="split split-horizontal content"></div>
+                    <div id="editors-logs" class="split split-horizontal">
+                        <div id="editors" class="split content editors">
+                            <div id="dialog-box"></div>
+                            <div id="dialog-confirm"></div>
+                            <div id="prompt-dialog"></div>
+                            <div id="loading-div-background">
+                                <div id="loading-div" class="ui-corner-all" >
+                                  <img id="loading-image" src="images/loading.gif" alt="Loading.."/>
+                                  <h2 id="loading-text">Please wait..</h2>
+                                 </div>
+                            </div>
+                            <div id="editor-tabs" class="editor-tabs">
+                                <ul>
+                                    <button id="btn-new-tab" class="btn-new-tab">New File</button>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="logs" class="split content">
+                            <div id="log-tabs" class="logging-tabs">
+                              <ul>
+                                <li><a href="#console">Console</a></li>
+                                <li><a href="#errors">Errors</a></li>
+                                <li><a href="#warnings">Warnings</a></li>
+                              </ul>
+                              <div id="console">
+                                  <div class="scrollabe-grid">
+                                      <ol id="console-list" class="selectable-list">
+                                      </ol>
+                                  </div>
+                              </div>
+                              <div id="errors">
+                                <div class="scrollabe-grid">
+                                    <ol id="error-list" class="selectable-list">
+                                    </ol>
+                                </div>
+                              </div>
+                              <div id="warnings">
+                                <div class="scrollabe-grid">
+                                    <ol id="warning-list" class="selectable-list">
+                                    </ol>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!--/div-->
+        <script src="./js/jquery.js"></script>
+        <script src="./js/jquery.noty.packaged.js"></script>
+        <script src="./js/jstree/jstree.js"></script>
+        <script src="./js/jquery.hoverIntent.js"></script>
+        <script src="./js/jquery.mnmenu.0.0.17.src.js"></script>
+        <script src="./jqueryui/jquery-ui.js"></script>
+        <script src="./js/jquery.ui-contextmenu.js"></script>
+        <script src="./index.coffee"></script>
+
+    </body>
+</html>
