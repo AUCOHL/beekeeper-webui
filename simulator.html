@@ -12,27 +12,38 @@
         margin:0;
 		position: absolute;
 	    left:0;
-		right:0;
-		top:40px;
-		bottom:0;
+		right:100px;
+		top:50px;
+		bottom:100px;
     }
   </style>
 </head>
 <body>
-	<div id="toolbar" class="toolbar">
-		<button id="toolbar-validate" class="toolbar-btn">Open</button>
-		<button id="toolbar-synthesize" class="toolbar-btn">Save</button>
-		<button id="toolbar-simulate" class="toolbar-btn">Simulate</button>
+		<button id="toolbar-validate" class="toolbar-btn" onclick="openfile.js">Open</button>
+		<button id="toolbar-synthesize" class="toolbar-btn" onclick="savefile.js">Save</button>
+		<button id="toolbar-simulate" class="toolbar-btn" onclick="simulate.js">Simulate</button>
 	</div>
-    <div id="editor">
-
+    <div id="editor"></div>
+	<div id="console">
+		<div class="scrollabe-grid">
+			<ol id="console-list" class="selectable-list">
+			</ol>
+		</div>
 	</div>
 
     <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>
         var editor = ace.edit("editor");
-        editor.setTheme("ace/theme/twilight");
+		var consolerviewer = ace.edit("consoleviewer");
+		editor.setTheme("ace/theme-xcode");
         editor.session.setMode("ace/mode/javascript");
+		editor.commands.addCommand({
+    name: 'save',
+    bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
+    exec: function(editor) {
+        console.log("saving", editor.session.getValue())
+    }
+})
     </script>
 
 </body>
