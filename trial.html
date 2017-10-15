@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>CloudV IDE</title>
+        <script src="/fabric/fabric.js"></script>
+    	<script src="/ace/ace.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="/ace/mode-json.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="/ace/mode-verilog.js" type="text/javascript" charset="UTF-8"></script>
+    	<script src="/ace/ext-language_tools.js" type="text/javascript" charset="UTF-8"></script>
+        <script id="init-vars" type="text/javascript">
+    		window.repoName = "toycpu";window.ownerName = "ash0x0";window.repoTitle = "toyCPU"
+        </script>
+        <script src="/javascripts/src/vendor/modernizr-2.8.3.min.js"></script>
+
+    </head>
+    <body>
+        <div id="ide" class="ide-body">
+            <div id="menu"></div>
+            <div id="toolbar" class="toolbar">
+                <!-- <button id="toolbar-validate" class="toolbar-btn">Validate</button>
+                <button id="toolbar-synthesize" class="toolbar-btn">Synthesize</button>
+                <button id="toolbar-simulate" class="toolbar-btn">Simulate</button> -->
+            </div>
+            <div id="files-editors-logs">
+                <!--div id="files" class="split split-horizontal content"></div-->
+                <div id="files" class="ui-layout-west outer-west split split-horizontal content"></div>
+                <!-- <div id="editors-logs" class="split split-horizontal"> -->
+                <div id="editors-logs" class="ui-layout-center outer-center split split-horizontal">
+                    <!--div id="editors" class="split content editors"-->
+                    <div id="editors" class="ui-layout-center inner-center split content editors">
+                        <div id="editor-tabs" class="editor-tabs">
+                            <div id="editor-tabs-inner" class="chrome-tabs">
+                              <div class="chrome-tabs-content">
+                              </div>
+                              <div class="chrome-tabs-bottom-bar"></div>
+
+                            </div>
+                            <div id="tab-content">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="logs" class="ui-layout-south inner-south split content">
+                        <div id="log-tabs" class="logging-tabs">
+
+                                <div id="log-tabs-inner" class="chrome-tabs">
+                                  <div class="chrome-tabs-content"></div>
+                                  <div class="chrome-tabs-bottom-bar"></div>
+
+                                </div>
+                                <div id="log-content">
+                                    <div id="console">
+                                        <div class="scrollabe-grid">
+                                            <ol id="console-list" class="selectable-list">
+                                            </ol>
+                                        </div>
+                                    </div>
+                                    <div id="errors">
+                                      <div class="scrollabe-grid">
+                                          <ol id="error-list" class="selectable-list">
+                                          </ol>
+                                      </div>
+                                    </div>
+                                    <div id="warnings">
+                                      <div class="scrollabe-grid">
+                                          <ol id="warning-list" class="selectable-list">
+                                          </ol>
+                                      </div>
+                                    </div>
+                                </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <script>window.jQuery || document.write('<script src="/javascripts/src/vendor/jquery-3.1.1.min.js"><\/script>')</script>
+        <script type="text/javascript">
+            jQuery.migrateMute = 1;
+        </script>
+        <script src="/javascripts/src/vendor/jquery-migrate-3.0.0.min.js"></script>
+        <script src="/javascripts/src/vendor/jquery-ui-1.11.4/jquery-ui.min.js" charset="utf-8"></script>
+        <script src="/javascripts/src/vendor/jquery.noty.packaged.js" charset="utf-8"></script>
+
+        <script src="/socketio/socket.io.min.js"></script>
+        <script src="/javascripts/ide.min.js"></script>
+
+
+    </body>
+</html>
