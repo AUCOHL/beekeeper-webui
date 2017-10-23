@@ -6,19 +6,19 @@
         <link rel="stylesheet" type="text/css" href="Styles/light.css" id="theme0"></link>
 		<link rel="icon" type="image/png" sizes="16x16" href="Images/favicon.ico">
 
-		<link rel="stylesheet" type="text/css" href="./jqueryui/jquery-ui.css">
-	    <link rel="stylesheet" type="text/css" href="./jqueryui/jquery-ui.theme.css">
-	    <link rel="stylesheet" type="text/css" href="./waveform.css">
-	    <!-- <script src="./fabric/fabric.require.js"></script> -->
-	    <script src="./fabric/fabric.js"></script>
-	    <script src="./jqueryui/external/jquery/jquery.js"></script>
-	    <script src="./jqueryui/jquery-ui.js"></script>
-	    <script type="text/javascript" src="waveform.js"></script>
-        <meta charset="utf-8"/>
+		<link rel="stylesheet" type="text/css" href="./waveform-viewer/jqueryui/jquery-ui.css">
+	    <link rel="stylesheet" type="text/css" href="./waveform-viewer/jqueryui/jquery-ui.theme.css">
+	    <link rel="stylesheet" type="text/css" href="./waveform-viewer/waveform.css">
+	    <script src="./waveform-viewer/fabric/fabric.js"></script>
+	    <script src="./waveform-viewer/jqueryui/external/jquery/jquery.js"></script>
+	    <script src="./waveform-viewer/jqueryui/jquery-ui.js"></script>
+	    <script type="text/javascript" src="./waveform-viewer/waveform.js"></script>
+
+		<meta charset="utf-8"/>
     </head>
     <body >
         <header>
-			<img src='Images/xxxs.png'/>
+			<img src='Images/logo-xxxs.png'/>
         </header>
         <main>
             <aside>
@@ -37,7 +37,7 @@
             <section>
 				<div class="vertical-seperator"></div>
 				<div id="toolbar" class="toolbar">
-				<a href='javascript:void(0)' onclick='this.value='Compiling...';this.disabled=true;'><img src='Images/assemble.png' /><span class='tooltip'>Compile Code</span></a>
+				<a href='javascript:void(0)' onclick='this.float='Compiling...';this.disabled=true;'><img src='Images/assemble.png' /><span class='tooltip'>Compile Code</span></a>
 					<a href='javascript:void(0)' onclick='this.value='Running...';this.disabled=true;'><img src='Images/play.png' /><span class='tooltip'>Run</span></a>
 					<a href='javascript:void(0)' onclick='this.value='Stepping';this.disabled=true;'><img src='Images/step.png' /><span class='tooltip'>Step</span></a>
 					<select id='consoleSel'>
@@ -54,5 +54,6 @@
         <script type="text/javascript" charset="utf-8" src="Scripts/jquery.js"></script>
         <script type="text/javascript" charset="utf-8" src="ace/ace.js"></script>
         <script type="text/javascript" charset="utf-8" src="Scripts/oakui.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="Scripts/oak.min.js"></script>
     </body>
 </html>

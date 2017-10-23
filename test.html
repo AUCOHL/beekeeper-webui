@@ -1,0 +1,73 @@
+<!doctype HTML>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+    </head>
+    <body class='noTab'>
+        <header>
+            <a href='javascript:void(0)' onclick='uiAssemble()'><img src='Images/assemble.png' /><span class='tooltip'>Assemble</span></a>
+            <a href='javascript:void(0)' onclick='uiStepbystep()'><img src='Images/stepByStep.png' /><span class='tooltip'>Step By Step</span></a>
+            <a href='javascript:void(0)' onclick='uiSimulate()'><img src='Images/play.png' /><span class='tooltip'>Play</span></a>
+        </header>
+        <main>
+            <aside>
+                <div class='grabberX' id='sideGrabber'></div>
+                <div class='optionsTabs'>
+                    <div class='selected' onclick="setOptionsTab(0)">Project Settings</div><div onclick="setOptionsTab(1)">Registers</div><div onclick="setOptionsTab(2)">Num. Conversion</div>
+                </div>
+                <div class='projectSettings selected'>
+                    <div>
+                        <div>
+                            <span>File Name</span>
+                            <input placeholder='File Name' id='filename' value='Test 1' />
+                        </div><div>
+                            <span>Instruction Set</span>
+                            <select id='isa'>
+                                <option value='0'>RISC-V</option>
+                                <option selected="selected" value='1'>MIPS</option>
+                            </select>
+                        </div><div>
+                            <span>Memory Size (Bytes)</span>
+                            <input placeholder='Memory Size (Bytes)' type='number' id='memsize' value='4096' />
+                        </div>
+                    </div>
+                    <button id='applyBtn'>Apply</button>
+                </div>
+            </aside>
+            <section>
+                <nav id='tabs'></nav>
+                <div id='editor'></div>
+                <div class='grabberY' id='yGrabber'></div>
+                <aside>
+                    <div class='grabberX' id='editorGrabber'></div>
+                    <textarea id='machineCode'></textarea>
+                </aside>
+                <select id='editorSel'>
+                    <option value='0'>Hide Machine Code</option>
+                    <option value='1'>Show Machine Code</option>
+                </select>
+            </section>
+            <footer>
+                <select id='consoleSel'>
+                    <option value='0'>Console</option>
+                    <option value='1'>Memory</option>
+                    <option value='2'>Instruction Log</option>
+                </select>
+            </footer>
+        </main>
+        <nav id="contextMenu">
+            <ul>
+                <li>Rename Tab</li>
+                <li>Move Tab</li>
+                <li>Close Tab</li>
+            </ul>
+        </nav>
+        <script type="text/javascript" charset="utf-8" src="Scripts/jquery.js"></script>
+        <script type="text/javascript" charset="utf-8" src="Scripts/oak.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="Scripts/ace.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="Scripts/Ace/mode-mips.js"></script>
+        <script type="text/javascript" charset="utf-8" src="Scripts/Ace/mode-riscv.js"></script>
+        <script type="text/javascript" charset="utf-8" src="Scripts/Ace/theme-oak.js"></script>
+        <script type="text/javascript" charset="utf-8" src="Scripts/oakui.min.js"></script>
+    </body>
+</html>
