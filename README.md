@@ -1,6 +1,6 @@
 # Dependencies
-	In the process of figuring them out in a fresh environment
-	There are many :( apparently a bad programmer is at work here
+In the process of figuring them out in a fresh environment
+There are many :( apparently a bad programmer is at work here
 
 ## Beekeeper
 A working version of Beekeeper is required. Place inside the project directory.
@@ -9,7 +9,7 @@ All dependencies required for Beekeeper must be met.
 ## dos2unix
 	sudo apt install dos2unix
 
-	Note: This is driving me nuts, I used to like perl before this.
+Note: This is driving me nuts, I used to like perl before this.
 ## socket.io
 	npm install -g socket.io
 
@@ -18,11 +18,11 @@ All dependencies required for Beekeeper must be met.
 	$ node socket.js
 	$ cd public
 
-	Open Index.html in public folder, that's it, go ahead.
+Open Index.html in public folder, that's it, go ahead.
 
 # Functionality
 
-	Note: Single click is at work here. It's working in the background there's just no loading screen, will add.
+Note: Single click is at work here. It's working in the background there's just no loading screen, will add.
 
 ## Not working
 	Single stepping. This requires a node wrapper for Beekeeper IO.
