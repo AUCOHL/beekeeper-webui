@@ -59,8 +59,11 @@ main > aside {
     padding-left: 4px;
     font-size: 75%;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 	resize: vertical;
 	overflow: auto;
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 }
@@ -69,6 +72,7 @@ main > aside span {
     margin: 4px 3%;
 }
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 main > aside select, main > aside input {
     width: 94%;
@@ -89,6 +93,8 @@ main > aside select, main > aside input {
     overflow: hidden;
 }*/
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 /* Resizers */
@@ -125,6 +131,7 @@ header > select {
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 footer > select {
     position: absolute;
     top: 0;
@@ -136,6 +143,8 @@ footer > select {
     margin-right: 16px;
 }
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 header > div {
@@ -234,6 +243,7 @@ a:hover .tooltip {
     border-style: solid;
 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 #console, #log, #memory {
     position: absolute;
@@ -261,5 +271,7 @@ footer span {
 footer span b {
     font-family: monospace;
 }
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
