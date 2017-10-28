@@ -22,8 +22,10 @@ function handler (req, res) {
 io.on('connection', function (socket) {
 	socket.emit('proceed', { hello: 'world' });
 
-	socket.on('assemble', function (filename) {
-		exec(`cp ${filename} Beekeeper/ && cd Beekeeper && make && ./bkcc ${filename} && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
+	socket.on('assemble', function (code) {
+		console.log(code);
+		exec(`touch code.c && truncate -s 0 code.c && echo "${code}" > code.c`);
+		exec(`cp code.c Beekeeper/ && cd Beekeeper && make && ./bkcc code.c && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`File reading failed: ${error}.`);
 				process.exit(73);
