@@ -58,14 +58,18 @@ main > aside {
     box-sizing: border-box;
     padding-left: 4px;
     font-size: 75%;
+<<<<<<< Updated upstream
 	resize: vertical;
 	overflow: auto;
+=======
+>>>>>>> Stashed changes
 }
 
 main > aside span {
     margin: 4px 3%;
 }
 
+<<<<<<< Updated upstream
 main > aside select, main > aside input {
     width: 94%;
     margin: 4px 3%;
@@ -85,16 +89,9 @@ main > aside select, main > aside input {
     overflow: hidden;
 }*/
 
+=======
+>>>>>>> Stashed changes
 /* Resizers */
-.grabberX {
-    position: absolute;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    cursor: ew-resize;
-    z-index: 40;
-}
-
 .grabberY {
     position: absolute;
     bottom: 0;
@@ -127,6 +124,7 @@ header > select {
     color: #eee;
 }
 
+<<<<<<< Updated upstream
 footer > select {
     position: absolute;
     top: 0;
@@ -138,6 +136,8 @@ footer > select {
     margin-right: 16px;
 }
 
+=======
+>>>>>>> Stashed changes
 header > div {
     position: relative;
     display: inline-block;
@@ -233,6 +233,7 @@ a:hover .tooltip {
     border-width: 5px;
     border-style: solid;
 }
+<<<<<<< Updated upstream
 
 #console, #log, #memory {
     position: absolute;
@@ -260,3 +261,5 @@ footer span {
 footer span b {
     font-family: monospace;
 }
+=======
+>>>>>>> Stashed changes
