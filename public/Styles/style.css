@@ -16,7 +16,7 @@ main {
 section {
     position: absolute;
     top: 10;
-    height: 75%;
+    height: 100%;
     left: 0;
     width: 50%;
     box-sizing: border-box;
@@ -33,10 +33,7 @@ section > #editor {
     top: 40px;
     bottom: 0;
     width: 100%;
-}
-
-section > #editor * {
-    font-family: monospace;
+	font-family: monospace;
 }
 
 /* Section Side */
@@ -61,27 +58,8 @@ main > aside {
     box-sizing: border-box;
     padding-left: 4px;
     font-size: 75%;
-}
-
-.optionsTabs {
-    width: 100%;
-}
-
-.optionsTabs > div.selected {
-    background: transparent;
-}
-
-.optionsTabs > div {
-    width: 33.3%;
-    padding: 8px;
-    box-sizing: border-box;
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-    transition: background-color 0.5s ease, color 0.5s ease;
-    cursor: pointer;
+	resize: vertical;
+	overflow: auto;
 }
 
 main > aside span {
@@ -97,21 +75,15 @@ main > aside select, main > aside input {
     margin-bottom: 16px;
 }
 
-#outputVal {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 /* Console */
-footer {
+/*footer {
     position: absolute;
     bottom: 0;
     height: 25%;
     left: 0;
     width: 50%;
     overflow: hidden;
-}
+}*/
 
 /* Resizers */
 .grabberX {
@@ -146,92 +118,6 @@ header img {
     transition: transform 0.3s ease-in-out;
 }
 
-header > a {
-    float: right;
-    height: 100%;
-    box-sizing: border-box;
-    padding: 0.5em;
-    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-    position: relative;
-}
-
-header > a > img {
-    height: 100%;
-}
-
-.noTab header > a {
-    display: none;
-}
-
-header > a:first-child, .noFloat {
-    float: none;
-    display: inline-block;
-    height: 100%;
-    vertical-align: top;
-    color: #ddd;
-    font-size: 80%;
-    text-decoration: none;
-    cursor: pointer;
-    padding: 4px 16px;
-}
-
-.noFloat {
-    padding: 1em 2em;
-}
-
-header > a:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-header > a:hover img {
-    transform: scale(1.2);
-}
-
-/* Navigation Tabs */
-main nav {
-    width: 100%;
-	top:20px;
-    white-space: nowrap;
-    overflow-x: hidden;
-    overflow-y: hidden;
-}
-
-main nav:hover {
-    overflow-x: auto;
-    overflow-x: overlay;
-}
-
-main nav > div.edited > span:after {
-    content: '*';
-}
-
-main nav > div > div {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    margin-left: 12px;
-    margin-bottom: -1px;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    background-size: cover;
-    background-position: cover;
-}
-
-main nav > div:hover > div, main nav > div.selected > div {
-    opacity: 0.6;
-}
-
-main nav > div {
-    display: inline-block;
-    padding: 2px;
-    border-right: 1px solid;
-    padding: 6px 12px;
-    font-size: 70%;
-    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-    user-select: none;
-    cursor: pointer;
-}
-
 /* Tool Selector */
 header > select {
     float: right;
@@ -239,64 +125,6 @@ header > select {
     padding: 0 1em;
     border: none;
     color: #eee;
-}
-
-/* Context Menu */
-#contextMenu {
-    color: #666;
-    position: absolute;
-    background: #eee;
-    border-radius: 2px;
-    border: 1px solid #aaa;
-    font-size: 75%;
-    display: none;
-    z-index: 99;
-}
-
-#contextMenu > ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-#contextMenu li {
-    padding: 4px 8px;
-}
-
-#contextMenu li:hover {
-    background: #7c8ea6;
-    color: white;
-    cursor: pointer;
-}
-
-/* Table */
-table {
-    width: 100%;
-    text-align: center;
-    font-size: 110%;
-    font-family: monospace;
-}
-
-table select {
-    padding: 0.2em;
-    margin: 0;
-    font-weight: bold;
-}
-
-td {
-    padding: 0.5em;
-}
-
-th {
-    font-weight: bold;
-    padding: 0.8em;
-}
-
-hr {
-    border: none;
-    height: 2px;
-    margin: 0 8px;
-    margin-bottom: 1em;
 }
 
 footer > select {
@@ -308,52 +136,6 @@ footer > select {
     padding: 0.5em;
     z-index: 1;
     margin-right: 16px;
-}
-
-#noTab {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    display: none;
-    text-align: center;
-}
-
-.noTab #noTab:before {
-  content: '';
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
-}
-
-.noTab #noTab {
-    display: block;
-}
-
-#noTab div {
-    display: inline-block;
-    vertical-align: middle;
-    text-align: center;
-    vertical-align: middle;
-    width: 50%;
-}
-
-#noTab p {
-    font-size: 80%;
-}
-
-#noTab button {
-    width: 31%;
-    margin: 0 1%;
-    padding: 1em;
-    border: 8px solid transparent;
-    box-sizing: border-box;
-    font-size: 80%;
-}
-
-.noTab footer, .noTab aside, .noTab section {
-    display: none;
 }
 
 header > div {
@@ -463,10 +245,6 @@ a:hover .tooltip {
     padding: 1.5em;
     font-size: 100%;
     font-family: monospace;
-}
-
-#memory {
-    padding-top: 30px;
 }
 
 #console {
