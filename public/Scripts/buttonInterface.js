@@ -1,6 +1,8 @@
-var socket = io.connect('http://localhost');
+var socket = io.connect('http://localhost:9000');
 
-socket.emit('beekeeper');
+var waveform = document.getElementById("waveform-text");
+waveform.src = "Scripts/initialSource.js";
+
 document.getElementById("assemble").onclick = function () {
 	socket.emit('assemble');
 };
@@ -9,5 +11,5 @@ document.getElementById("run").onclick = function () {
 };
 
 document.getElementById("step").onclick = function () {
-	socket.emit('run');
+	socket.emit('step');
 };

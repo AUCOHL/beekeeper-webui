@@ -27,7 +27,6 @@ section {
 	background-color: #2C2E31;
 }
 
-
 section > #editor {
     position: absolute;
     top: 40px;
@@ -42,7 +41,6 @@ section > select {
     bottom: 0;
     right: 0;
     border: none;
-    background: transparent;
     padding: 0.5em;
     z-index: 2;
     margin-right: 16px;
@@ -58,51 +56,14 @@ main > aside {
     box-sizing: border-box;
     padding-left: 4px;
     font-size: 75%;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 	resize: vertical;
 	overflow: auto;
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
 
 main > aside span {
     margin: 4px 3%;
 }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-main > aside select, main > aside input {
-    width: 94%;
-    margin: 4px 3%;
-    padding: 0.5em;
-    border: none;
-    box-sizing: border-box;
-    margin-bottom: 16px;
-}
-
-/* Console */
-/*footer {
-    position: absolute;
-    bottom: 0;
-    height: 25%;
-    left: 0;
-    width: 50%;
-    overflow: hidden;
-}*/
-
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 /* Resizers */
 .grabberY {
     position: absolute;
@@ -136,26 +97,6 @@ header > select {
     color: #eee;
 }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-footer > select {
-    position: absolute;
-    top: 0;
-    right: 0;
-    border: none;
-    background: transparent;
-    padding: 0.5em;
-    z-index: 1;
-    margin-right: 16px;
-}
-
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 header > div {
     position: relative;
     display: inline-block;
@@ -251,39 +192,3 @@ a:hover .tooltip {
     border-width: 5px;
     border-style: solid;
 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
-#console, #log, #memory {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    display: none;
-    overflow: auto;
-    padding: 1.5em;
-    font-size: 100%;
-    font-family: monospace;
-}
-
-#console {
-    display: block;
-}
-
-footer span {
-    display: block;
-    padding: 0.2em;
-    font-family: monospace;
-}
-
-footer span b {
-    font-family: monospace;
-}
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes

@@ -14,7 +14,7 @@ header > a:hover, header > div > span:hover {
 
 /* Mains */
 main > aside {
-    background-color: #ddd;
+    background-color: #000000;
 }
 
 section {
@@ -22,7 +22,7 @@ section {
 }
 
 section > aside > textarea {
-    background-color: #f2f2f2;
+    background-color: #000000;
     color: #444;
 }
 
@@ -84,7 +84,7 @@ main nav::-webkit-scrollbar-track {
 
 main nav::-webkit-scrollbar-thumb {
     border-radius: 3px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+    webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
     height: 3px;
 }
 

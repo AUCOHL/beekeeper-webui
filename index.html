@@ -1,12 +1,11 @@
 <head>
-	<script src="/socket.io/socket.io.js"></script>
+	<script src="socket.io.js"></script>
 </head>
 <body>
 	<script>
-	  var socket = io('http://localhost');
-	  socket.on('news', function (data) {
-	    console.log(data);
-	    socket.emit('my other event', { my: 'data' });
-	  });
+		var socket = io('http://localhost:9000');
+		socket.on('proceed', function (data) {
+			console.log(data);
+		});
 	</script>
 </body>
