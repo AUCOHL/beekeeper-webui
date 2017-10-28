@@ -1,6 +1,5 @@
 # Dependencies
-In the process of figuring them out in a fresh environment
-There are many :( apparently a bad programmer is at work here
+In the process of figuring them out in a fresh environment. There are many :( apparently a bad programmer is at work here
 
 ## Beekeeper
 A working version of Beekeeper is required. Place inside the project directory.

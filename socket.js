@@ -22,9 +22,14 @@ function handler (req, res) {
 io.on('connection', function (socket) {
 	socket.emit('proceed', { hello: 'world' });
 
-	socket.on('assemble', function (code) {
+	socket.on('assemble', function (code, language) {
 		console.log(code);
-		exec(`touch code.c && truncate -s 0 code.c && echo "${code}" > code.c`);
+		if (language == "C") {
+			exec(`touch code.c && truncate -s 0 code.c && echo "${code}" > code.c`);
+		}
+		if (language == "RISC-V") {
+			exec(`touch code.s && truncate -s 0 code.s && echo "${code}" > code.s`);
+		}
 		exec(`cp code.c Beekeeper/ && cd Beekeeper && make && ./bkcc code.c && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`Assembly failed: ${error}.`);

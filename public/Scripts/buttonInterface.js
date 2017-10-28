@@ -5,7 +5,7 @@ var syntax = document.getElementById("syntaxSel");
 
 document.getElementById("assemble").onclick = function (code) {
 	var code = editor.getValue();
-	socket.emit('assemble', code);
+	socket.emit('assemble', code, language);
 };
 
 document.getElementById("run").onclick = function () {
