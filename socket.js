@@ -22,32 +22,32 @@ function handler (req, res) {
 io.on('connection', function (socket) {
 	socket.emit('proceed', { hello: 'world' });
 
-	socket.on('assemble', function (data) {
-		exec(`cp ${data} Beekeeper/ && cd Beekeeper && make && ./bkcc ${data} && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
+	socket.on('assemble', function (filename) {
+		exec(`cp ${filename} Beekeeper/ && cd Beekeeper && make && ./bkcc ${filename} && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
 			if (error || stderr) {
-			console.error(`File reading failed: ${error}.`);
-			process.exit(73);
+				console.error(`File reading failed: ${error}.`);
+				process.exit(73);
 			}
 		});
 	});
 
 	socket.on('run', function (data) {
-		exec(`if (pwd != Beekeeper) cd Beekeeper && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && ./vcd2json dump.vcd`, (error, stdout, stderr) => {
-			if (error || stderr) {
-			console.error(`File reading failed: ${error}.`);
-			process.exit(73);
-			}
-			socket.emit('respone', { respone: stdout });
-		});
-	});
-
-	socket.on('step', function (data) {
-		exec(`s`, (error, stdout, stderr) => {
+		exec(`if [pwd != Beekeeper] cd Beekeeper && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`File reading failed: ${error}.`);
 				process.exit(73);
 			}
-			socket.emit('respone', { respone: stdout });
+			socket.emit('respone', stdout);
+		});
+	});
+
+	socket.on('step', function (data) {
+		exec(`if [pwd != Beekeeper] cd Beekeeper && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
+			if (error || stderr) {
+				console.error(`File reading failed: ${error}.`);
+				process.exit(73);
+			}
+			socket.emit('respone', stdout);
 		});
 	});
 });
