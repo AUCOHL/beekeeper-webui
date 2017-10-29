@@ -22,14 +22,14 @@ function handler (req, res) {
 io.on('connection', function (socket) {
 	socket.emit('proceed', { hello: 'world' });
 
-	socket.on('assemble', function (code, language) {
+	socket.on('assemble', function (code) {
 		console.log(code);
-		if (language == "C") {
+		// if (language == "C") {
 			exec(`touch code.c && truncate -s 0 code.c && echo "${code}" > code.c`);
-		}
-		if (language == "RISC-V") {
-			exec(`touch code.s && truncate -s 0 code.s && echo "${code}" > code.s`);
-		}
+		// }
+		// if (language == "RISC-V") {
+		// 	exec(`touch code.s && truncate -s 0 code.s && echo "${code}" > code.s`);
+		// }
 		exec(`cp code.c Beekeeper/ && cd Beekeeper && make && ./bkcc code.c && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`Assembly failed: ${error}.`);
@@ -40,7 +40,7 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('run', function (data) {
-		exec(`if [pwd != Beekeeper] cd Beekeeper && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
+		exec(`if [pwd != Beekeeper] then cd Beekeeper; && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`Running failed: ${error}.`);
 				process.exit(73);
