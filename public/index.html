@@ -36,17 +36,17 @@
 						<option value='1'>RISC-V</option>
 					</select>
 				</div>
-			 	<div id='editor'></div>
+				<div id="editor"></div>
+				<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 				<script>
-					var editor = ace.edit();
-					editor.setValue("Samples/CCode/main.c");
+				    var editor = ace.edit("editor");
+				    editor.setTheme("ace/theme/monokai");
+				    editor.getSession().setMode("ace/mode/javascript");
 				</script>
             </section>
         </main>
-		<script type="text/javascript" charset="utf-8" src="ace/ace.js"></script>
 		<script type="text/javascript" charset="utf-8" src="Scripts/socket.io.js"></script>
 		<script type="text/javascript" charset="utf-8" src="Scripts/buttonInterface.js"></script>
         <script type="text/javascript" charset="utf-8" src="Scripts/jquery.js"></script>
-        <script type="text/javascript" charset="utf-8" src="Scripts/oakui.min.js"></script>
     </body>
 </html>
