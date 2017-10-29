@@ -30,7 +30,7 @@ io.on('connection', function (socket) {
 		// if (language == "RISC-V") {
 		// 	exec(`touch code.s && truncate -s 0 code.s && echo "${code}" > code.s`);
 		// }
-		exec(`cp code.c Beekeeper/ && cd Beekeeper && make && make soc && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
+		exec(`cp code.c Beekeeper/ && cd Beekeeper && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`Assembly failed: ${error}.`);
 				process.exit(73);
