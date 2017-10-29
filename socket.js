@@ -19,35 +19,6 @@ function handler (req, res) {
 	});
 }
 
-
-var txtFile = "c:/test.txt";
-var file = new File(txtFile);
-var str = "My string of text";
-
-file.open("w"); // open file with write access
-file.writeln("First line of text");
-file.writeln("Second line of text " + str);
-file.write(str);
-file.close();
-
-/// read from file
-
-var txtFile = "dump.vcd"
-var file = new File(txtFile);
-
-file.open("r");
-
-function readTextFile(filepath) {
-	var str = "";
-	var txtFile = new File(filepath);
-	txtFile.open("r");
-	while (!txtFile.eof) {
-		// read each line of text
-		str += txtFile.readln() + "\n";
-	}
-	return str;
-}
-
 io.on('connection', function (socket) {
 	socket.emit('proceed', { state: 'fine' });
 
@@ -82,8 +53,6 @@ io.on('connection', function (socket) {
 				}
 			});
 		});
-
-
 		var txtFile = `/home/${uname}/bin/beekeeper-webui/Beekeeper/dump.vcd`
 		var file = new File(txtFile);
 
