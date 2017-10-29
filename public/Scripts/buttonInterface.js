@@ -7,9 +7,9 @@ document.getElementById("assemble").onclick = function (code) {
 	socket.emit('assemble', code);
 };
 
-// document.getElementById("run").onclick = function () {
-// 	socket.emit('run');
-// };
+document.getElementById("run").onclick = function () {
+	socket.emit('run');
+};
 
 document.getElementById("step").onclick = function () {
 	socket.emit('step');

@@ -23,7 +23,7 @@ io.on('connection', function (socket) {
 	socket.emit('proceed', { state: 'fine' });
 
 	var uname="";
-	exec (`echo"$USER"`, (error, stdout, stderr) => {
+	exec (`echo "$USER"`, (error, stdout, stderr) => {
 		if (error || stderr) {
 			console.error(`Couldn't get username: ${error}.`);
 			process.exit(73);
@@ -53,42 +53,31 @@ io.on('connection', function (socket) {
 				}
 			});
 		});
-		var txtFile = `/home/${uname}/bin/beekeeper-webui/Beekeeper/dump.vcd`
-		var file = new File(txtFile);
-
-		file.open("r"); // open file with read access
-		var str = "";
-		while (!file.eof) {
-			// read each line of text
-			str += file.readln() + "\n";
-		}
-		file.close();
-		socket.emit(response, str);
 	});
 
 	socket.on('run', function (data) {
 		// exec(`if [pwd != Beekeeper] then cd Beekeeper; && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
+		exec(`cd Beekeeper && dos2unix vcd2js.pl && ./vcd2js.pl dump.vcd`, (error, stdout, stderr) => {
+			if (error || stderr) {
+				console.error(`Assembly failed: ${error}.`);
+				process.exit(73);
+			}
+			socket.emit(response, stdout);
+		});
+	});
+
+	socket.on('step', function (data) {
 		exec(`cp code.c Beekeeper/ && cd Beekeeper && ./bkcc code.c && make soc && iverilog -o Beekeeper.vvp Generated.v && beekeeper`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`Assembly failed: ${error}.`);
 				process.exit(73);
 			}
-			exec('r', (error1, stdout1, stderr1) => {
+			exec('s', (error1, stdout1, stderr1) => {
 				if (error1 || stderr1) {
 					console.error(`Running failed: ${error}.`);
 					process.exit(73);
 				}
 			});
-		});
-	});
-
-	socket.on('step', function (data) {
-		exec(`if [pwd != Beekeeper] cd Beekeeper && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
-			if (error || stderr) {
-				console.error(`Stepping failed: ${error}.`);
-				process.exit(73);
-			}
-			socket.emit('respone', stdout);
 		});
 	});
 });
