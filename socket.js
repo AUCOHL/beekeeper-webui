@@ -19,8 +19,47 @@ function handler (req, res) {
 	});
 }
 
+
+var txtFile = "c:/test.txt";
+var file = new File(txtFile);
+var str = "My string of text";
+
+file.open("w"); // open file with write access
+file.writeln("First line of text");
+file.writeln("Second line of text " + str);
+file.write(str);
+file.close();
+
+/// read from file
+
+var txtFile = "dump.vcd"
+var file = new File(txtFile);
+
+file.open("r");
+
+function readTextFile(filepath) {
+	var str = "";
+	var txtFile = new File(filepath);
+	txtFile.open("r");
+	while (!txtFile.eof) {
+		// read each line of text
+		str += txtFile.readln() + "\n";
+	}
+	return str;
+}
+
 io.on('connection', function (socket) {
-	socket.emit('proceed', { hello: 'world' });
+	socket.emit('proceed', { state: 'fine' });
+
+	var uname="";
+	exec (`echo"$USER"`, (error, stdout, stderr) => {
+		if (error || stderr) {
+			console.error(`Couldn't get username: ${error}.`);
+			process.exit(73);
+		}
+		uname = stdout;
+	});
+
 
 	socket.on('assemble', function (code) {
 		console.log(code);
@@ -30,22 +69,47 @@ io.on('connection', function (socket) {
 		// if (language == "RISC-V") {
 		// 	exec(`touch code.s && truncate -s 0 code.s && echo "${code}" > code.s`);
 		// }
-		exec(`cp code.c Beekeeper/ && cd Beekeeper && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
+		// exec(`cp code.c Beekeeper/ && cd Beekeeper && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
+		exec(`cp code.c Beekeeper/ && cd Beekeeper && ./bkcc code.c && make soc && iverilog -o Beekeeper.vvp Generated.v && beekeeper`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`Assembly failed: ${error}.`);
 				process.exit(73);
 			}
-			socket.emit('done');
+			exec('r', (error1, stdout1, stderr1) => {
+				if (error1 || stderr1) {
+					console.error(`Running failed: ${error}.`);
+					process.exit(73);
+				}
+			});
 		});
+
+
+		var txtFile = `/home/${uname}/bin/beekeeper-webui/Beekeeper/dump.vcd`
+		var file = new File(txtFile);
+
+		file.open("r"); // open file with read access
+		var str = "";
+		while (!file.eof) {
+			// read each line of text
+			str += file.readln() + "\n";
+		}
+		file.close();
+		socket.emit(response, str);
 	});
 
 	socket.on('run', function (data) {
-		exec(`if [pwd != Beekeeper] then cd Beekeeper; && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
+		// exec(`if [pwd != Beekeeper] then cd Beekeeper; && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
+		exec(`cp code.c Beekeeper/ && cd Beekeeper && ./bkcc code.c && make soc && iverilog -o Beekeeper.vvp Generated.v && beekeeper`, (error, stdout, stderr) => {
 			if (error || stderr) {
-				console.error(`Running failed: ${error}.`);
+				console.error(`Assembly failed: ${error}.`);
 				process.exit(73);
 			}
-			socket.emit('respone', stdout);
+			exec('r', (error1, stdout1, stderr1) => {
+				if (error1 || stderr1) {
+					console.error(`Running failed: ${error}.`);
+					process.exit(73);
+				}
+			});
 		});
 	});
 

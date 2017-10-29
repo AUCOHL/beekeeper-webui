@@ -13,6 +13,10 @@ Note: This is driving me nuts, I used to like perl before this.
 	npm install -g socket.io
 
 # Usage
+Must place the project root under /home/$USER/bin/
+For branch old-version use Beekeeper commit fa480a2
+For branch master use latest version of Beekeeper
+
 	$ cd <project-root-directory>
 	$ node socket.js
 	$ cd public
