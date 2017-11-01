@@ -1,4 +1,4 @@
-x #!/usr/bin/env node
+#!/usr/bin/env node
 const exec = require('child_process').exec;
 const path = require('path');
 var app = require('http').createServer(handler);
@@ -41,7 +41,7 @@ io.on('connection', function (socket) {
 		// 	exec(`touch code.s && truncate -s 0 code.s && echo "${code}" > code.s`);
 		// }
 		// exec(`cp code.c Beekeeper/ && cd Beekeeper && iverilog -o app.bin_dump/Beekeeper.vvp -I /usr/local/bin/BeekeeperSupport BFM.v`, (error, stdout, stderr) => {
-		exec(`cp code.c Beekeeper/ && cd Beekeeper && ./Scripts/bkcc code.c && make soc && iverilog -o Beekeeper.vvp Generated.v`, (error, stdout, stderr) => {
+		exec(`cp code.c Beekeeper/ && cd Beekeeper && ./bkcc code.c && make soc && iverilog -o Beekeeper.vvp Generated.v && beekeeper`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`Assembly failed: ${error}.`);
 				process.exit(73);

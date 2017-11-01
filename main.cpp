@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <iostream>
 #include <netinet/in.h>
-#include "Beekeeper/Native/CLI_IO.cpp"
+#include "Beekeeper/Native/IO.h"
 #include "json.hpp"
 
 using namespace std;
@@ -17,7 +17,7 @@ static const int PORT_NUMBER = 9000;
 
 void error(const char *msg)
 {
-    cerr << msg << endl;
+    perror(msg);
     exit(1);
 }
 
@@ -60,25 +60,16 @@ int main(int argc, char *argv[])
      if (n < 0) error("ERROR reading from socket");
      cout << buffer << endl;
      
-     n = write(newsockfd,"acknowledge",12);
+     n = write(newsockfd,"acknowledge",18);
      if (n < 0) error("ERROR writing to socket");
      
      auto sentData = json::parse(buffer);
      
-     string programPath = sentData.at(0);   //Path to code
-     string runModeString = sentData.at(1); //command string 
-     string stopPoints = sentData.at(2);    //array or vector of stoppoints
+     string programPath = sentData.find("path");
+     string runMode = sentData.find("mode");
+     string stopPoints = sentData.find("stops");
      
-     int runModeCode = 0;
-     if (runModeString == "r" || runModeString == "run") {
-         runModeCode = 1;
-     } else if (runModeString == "s" || runModeString == "step") {
-         runModeCode = 2;
-     } else if (runModeString == "si" || runModeString == "stepi") {
-         runModeCode = 3;
-     }
-     
-     debugConfiguration(programPath, runModeCode, stopPoints);
+     debugConfiguration(std::string& programPath, int& runMode, StopPoint::Container& stopPoints)
      
      close(newsockfd);
      close(sockfd);
