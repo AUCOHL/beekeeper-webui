@@ -59,7 +59,7 @@ io.on('connection', function (socket) {
 		// exec(`if [pwd != Beekeeper] then cd Beekeeper; && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
 		exec(`cd Beekeeper && dos2unix vcd2js.pl && ./vcd2js.pl dump.vcd`, (error, stdout, stderr) => {
 			if (error || stderr) {
-				console.error(`Assembly failed: ${error}.`);
+				console.error(`Running failed: ${error}.`);
 				process.exit(73);
 			}
 			socket.emit(response, stdout);
@@ -69,7 +69,7 @@ io.on('connection', function (socket) {
 	socket.on('step', function (data) {
 		exec(`cp code.c Beekeeper/ && cd Beekeeper && ./bkcc code.c && make soc && iverilog -o Beekeeper.vvp Generated.v && beekeeper`, (error, stdout, stderr) => {
 			if (error || stderr) {
-				console.error(`Assembly failed: ${error}.`);
+				console.error(`Stepping failed: ${error}.`);
 				process.exit(73);
 			}
 			exec('s', (error1, stdout1, stderr1) => {
@@ -77,6 +77,13 @@ io.on('connection', function (socket) {
 					console.error(`Running failed: ${error}.`);
 					process.exit(73);
 				}
+				exec(`cd Beekeeper && dos2unix vcd2js.pl && ./vcd2js.pl dump.vcd`, (error, stdout, stderr) => {
+					if (error || stderr) {
+						console.error(`Running failed: ${error}.`);
+						process.exit(73);
+					}
+					socket.emit(response, stdout);
+				});
 			});
 		});
 	});
