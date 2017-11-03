@@ -1,5 +1,10 @@
 # Dependencies
 In the process of figuring them out in a fresh environment. There are many :( apparently a bad programmer is at work here
+	node-getopt
+	iverilog
+	socket.io
+	dos2unix
+	Verilog::VCD
 
 ## Beekeeper
 A working version of Beekeeper is required. Place inside the project directory.
@@ -11,6 +16,13 @@ All dependencies required for Beekeeper must be met.
 Note: This is driving me nuts, I used to like perl before this.
 ## socket.io
 	npm install -g socket.io
+
+## node-getopt
+	npm install -g node-getopt
+
+## All dependencies
+	sudo apt install node dos2unix iverilog
+	npm install -g node-getopt socket.io
 
 # Usage
 Must place the project root under /home/$USER/bin/

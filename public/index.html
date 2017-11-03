@@ -21,6 +21,25 @@
 			<img src='Images/logo-xxxs.png'/>
         </header>
         <main>
+            <script>
+            var allText = `void function()
+{
+    int a = 42;
+    return;
+}
+
+int main()
+{
+    int a = 4;
+    int b = 3;
+    sample:
+    a = b << 2;
+    b = a + b;
+    function();
+    return 0;
+}
+`
+            </script>
             <aside>
 				<div id="waveform-container"></div>
 				<script id="waveform-text" type="text/javascript" src="Scripts/initialSource.js"></script>
@@ -42,13 +61,7 @@
 				    var editor = ace.edit("editor");
 				    editor.setTheme("ace/theme/monokai");
 				    editor.getSession().setMode("ace/mode/c_cpp");
-					var allText = `#include <stdio.h>
-int main()
-{
-   printf("Hello, World!");
-   return 0;
-}
-`
+
 					editor.setValue(`${allText}`);
 				</script>
             </section>
