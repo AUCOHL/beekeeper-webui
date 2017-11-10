@@ -18,13 +18,14 @@ socket.on('proceed', function() {
 });
 socket.on('respone', function(data) {
 		console.log("response received");
+		alert("Finished!");
 	  $("#waveform-container").load(window.location.href + "#waveform-container");
 });
 
 socket.on("finishedAssembly", function() {
-		alert("assembled!");
+		alert("Compiled!");
 });
 
 socket.on('error', function(data) {
-	alert(`${error}`);
+	// alert(`${error}`);
 });

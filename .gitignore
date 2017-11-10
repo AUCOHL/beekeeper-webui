@@ -1,2 +1,7 @@
 code.c
 code.txt
+BFM.c
+code.c.*
+*.bin_dump
+*.vcd
+*.v

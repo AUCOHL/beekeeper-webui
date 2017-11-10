@@ -1,0 +1,22 @@
+[{
+    "name": "Example",
+    "bus": "AXI4LITE",
+    "ips":
+    [
+        {
+            "id": "RISCVCore",
+            "owner": "Cloud-V",
+            "verilog": "MultiBee",
+            "bfm": true
+        },
+        {
+            "id": "Main",
+            "owner": "Cloud-V",
+            "verilog": "InstantRAM",
+            "bfm": true,
+            "programHere": true,
+            "start": 0,
+            "length": 4096
+        }
+    ]
+}]

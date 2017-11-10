@@ -9,7 +9,7 @@ In the process of figuring them out in a fresh environment. There are many :( ap
 ## Module Dependencies
     npm install -g socket.io node-getopt
 ## Beekeeper
-All dependencies required for Beekeeper must be met.
+All dependencies required for Beekeeper must be met. A working Installation of Beekeeper must exist in user home directory root.
 
 # Installation
 Must place the project root under /home/$USER/bin/
@@ -17,7 +17,6 @@ Beekeeper commit fa480a2 is placed inside the root project folder
 # Usage
 	cd <project-root-directory>
 	node socket.js
-	cd public
 
 Open Index.html in folder public, that's it, go ahead.
 
@@ -26,7 +25,7 @@ Open Index.html in folder public, that's it, go ahead.
 Note: Single click is at work here. It's working in the background there's just no loading screen, will add.
 
 # Not working
-  As of writing, all functional requirements are met. Will revisit.
+  Only compiling at the moment.
 # Future
 	Add loading spinner for buttons
 	Add Beekeeper as submodule

@@ -16,7 +16,7 @@ waveform.setOnChangeListener(function(e){
 	console.log(e);
 });
 `
-
+var filename = "code.c";
 function handler (req, res) {
 	fs.readFile(__dirname + '/public/index.html',
 		function (err, data) {
@@ -28,6 +28,16 @@ function handler (req, res) {
 		res.end(data);
 	});
 }
+
+function run (setTimeout(function () {
+	exec (`vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper ${filename}.bin_dump/Beekeeper.vvp`, (error, stdout, stderr) => {
+		if (error || stderr) {
+			console.error(`vvp failed: ${error}.`);
+			socket.emit('error', error);
+			//process.exit(73);
+		}
+	});
+}, 1000);)
 
 io.on('connection', function (socket) {
 	socket.emit('proceed', { state: 'fine' });
@@ -60,28 +70,14 @@ io.on('connection', function (socket) {
 					socket.emit('error', err);
 			    } else {
 					console.log("The file was saved!");
-					exec(`rm -f Beekeeper/code.c && cp -f code.c Beekeeper`, (error, stdout, stderr) => {
-						if (error || stderr) {
-							console.error(`cd failed: ${error}.`);
-							socket.emit('error', error);
-							//process.exit(73);
-						}
-					});
-					exec (`cd Beekeeper && ./bkcc code.c`, (error1, stdout1, stderr1) => {
+					exec (`/home/ahmed/BeekeeperSupport/cc ${filename}`, (error1, stdout1, stderr1) => {
 						if (error1 || stderr1) {
-							console.error(`bkcc failed: ${error1}.`);
+							console.error(`cc failed: ${error1}.`);
 							socket.emit('error', error1);
 							process.exit(73);
 						}
 					});
-					exec (`cd Beekeeper && make soc`, (error2, stdout2, stderr2) => {
-						if (error2 || stderr2) {
-							console.error(`make soc failed: ${error2}.`);
-							socket.emit('error', error2);
-							process.exit(73);
-						}
-					});
-					exec (`cd Beekeeper && iverilog -o Beekeeper.vvp Generated.v`, (error3, stdout3, stderr3) => {
+					exec (`iverilog -o code.c.bin_dump/Beekeeper.vvp -I/home/ahmed/BeekeeperSupport/ BFM.v`, (error3, stdout3, stderr3) => {
 						if (error3 || stderr3) {
 							console.error(`iverilog failed: ${error3}.`);
 							socket.emit('error', error3);
@@ -106,42 +102,36 @@ io.on('connection', function (socket) {
 		// exec(`if [pwd != Beekeeper] then cd Beekeeper; && iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp && dos2unix vcd2json.pl && touch dump.txt && ./vcd2js.pl dump.v`, (error, stdout, stderr) => {
 		// exec (`iverilog -M/usr/local/bin/BeekeeperSupport -mBeekeeper app.bin_dump/Beekeeper.vvp`, (error3, stdout3, stderr3) => {
 		var workingDirectory = "";
-		exec (`cd Beekeeper && pwd`, (error, stdout, stderr) => {
+		console.log("run received");
+		exec (`pwd`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`pwd failed: ${error}.`);
 				socket.emit('error', error);
 				//process.exit(73);
 			}
-			workingDirectory = stdout;
-			exec (`cd Beekeeper && iverilog -M${workingDirectory}/ -mBeekeeper ${workingDirectory}/Beekeeper.vvp`, (error1, stdout1, stderr1) => {
-				if (error1 || stderr1) {
-					console.error(`beekeeper failed: ${error1}.`);
-					socket.emit('error', error1);
+			run();
+			exec (`./vcd2js.pl dump.vcd`, (error3, stdout3, stderr3) => {
+				if (error3 || stderr3) {
+					console.error(`vcd2js failed: ${error3}.`);
+					socket.emit('error', error3);
 					//process.exit(73);
 				}
-			});
-		});
-		exec (`cd Beekeeper && ./vcd2js.pl dump.vcd`, (error3, stdout3, stderr3) => {
-			if (error3 || stderr3) {
-				console.error(`vcd2js failed: ${error3}.`);
-				socket.emit('error', error3);
-				//process.exit(73);
-			}
-			console.log(stdout3);
-			fs.writeFile("waveform-data.js", prefix+stdout3+suffix, function(err) {
-			    if(err) {
-			        return console.log(err);
-			    }
-			});
-			exec(`cp -f waveform-data.js public/Scripts`,
-				(error4, stdout4, stderr4) => {
-					if (error4 || stderr4) {
-						console.error(`waveform-source store failed: ${error4}.`);
-						socket.emit('error', error4);
-						//process.exit(73);
+				console.log(stdout3);
+				fs.writeFile("waveform-data.js", prefix+stdout3+suffix, function(err) {
+					if(err) {
+						return console.log(err);
 					}
+					exec(`cp -f waveform-data.js public/Scripts`,
+						(error4, stdout4, stderr4) => {
+							if (error4 || stderr4) {
+								console.error(`waveform-source store failed: ${error4}.`);
+								socket.emit('error', error4);
+								//process.exit(73);
+							}
+					});
+				});
+				socket.emit('response', stdout3);
 			});
-			socket.emit('response', stdout3);
 		});
 	});
 
