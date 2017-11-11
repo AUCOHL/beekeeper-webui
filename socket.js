@@ -5,9 +5,12 @@ var app = require('http').createServer(handler);
 var io = require('socket.io')(app);
 var fs = require('fs');
 var net = require('net');
+// var clientSocket = require('socket.io-client')('http://localhost:9001');
+
 
 app.listen(9000);
 
+var filename = "code.c";
 var prefix = `var data_cntr = `;
 var suffix = `;
 var timing = JSON.parse('{"rendered":["mod_7SEG_tb.clk","mod_7SEG_tb.segA","mod_7SEG_tb.segB","mod_7SEG_tb.segC","mod_7SEG_tb.segD","mod_7SEG_tb.segDP","mod_7SEG_tb.rst","mod_7SEG_tb.segE","mod_7SEG_tb.segF","mod_7SEG_tb.DUT.BCD[3:0]"],"hidden":["mod_7SEG_tb.DUT.SevenSeg[7:0]","mod_7SEG_tb.DUT.cntovf","mod_7SEG_tb.DUT.rst","mod_7SEG_tb.DUT.cnt[1:0]","mod_7SEG_tb.DUT.clk","mod_7SEG_tb.segG"],"from":43,"to":69,"cursor":"52.75","cursorExact":52.753017641597026,"end":150,"originalEnd":"150","radix":2,"timeScale":"1","timeScaleUnit":"ns","timeUnit":1000,"highlightedIndex":5}');
@@ -16,7 +19,7 @@ waveform.setOnChangeListener(function(e){
 	console.log(e);
 });
 `
-var filename = "code.c";
+
 function handler (req, res) {
 	fs.readFile(__dirname + '/public/index.html',
 		function (err, data) {
@@ -29,21 +32,41 @@ function handler (req, res) {
 	});
 }
 
-function run (setTimeout(function () {
-	exec (`vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper ${filename}.bin_dump/Beekeeper.vvp`, (error, stdout, stderr) => {
-		if (error || stderr) {
-			console.error(`vvp failed: ${error}.`);
-			socket.emit('error', error);
+function readDump() {
+	var out = "";
+	exec (`./vcd2js.pl dump.vcd`, (error3, stdout3, stderr3) => {
+		if (error3 || stderr3) {
+			console.error(`vcd2js failed: ${error3}.`);
+			socket.emit('error', error3);
 			//process.exit(73);
 		}
+		var out =  prefix+stdout3+suffix;
+		console.log(out);
+		fs.writeFile("waveform-data.js",out, function(err) {
+			if(err) {
+				return console.log(err);
+			}
+			exec(`cp -f waveform-data.js public/Scripts`,
+				(error4, stdout4, stderr4) => {
+					if (error4 || stderr4) {
+						console.error(`waveform-source store failed: ${error4}.`);
+						socket.emit('error', error4);
+						//process.exit(73);
+					}
+			});
+		});
+		return stdout3;
 	});
-}, 1000);)
+}
+
+var client = new net.Socket();
+client.connect(9001, '127.0.0.1', function() {
+	console.log('Connected to cpp socket');
+	client.write(`{"Connected": true}`);
+});
 
 io.on('connection', function (socket) {
 	socket.emit('proceed', { state: 'fine' });
-
-	/*The reason the entire function in nested inside an exec is to force
-	sequential execution. Apparently socket.io is that great.*/
 	var uname="";
 	exec (`echo "$USER"`, (error, stdout, stderr) => {
 		if (error || stderr) {
@@ -53,11 +76,26 @@ io.on('connection', function (socket) {
 		}
 		uname = stdout;
 	});
-
-
+	var workingDirectory="";
+	exec (`pwd`, (error, stdout, stderr) => {
+		if (error || stderr) {
+			console.error(`Couldn't get workingDirectory: ${error}.`);
+			socket.emit('error', error);
+			//process.exit(73);
+		}
+		workingDirectory = stdout;
+	});
+	var userHome="";
+	exec (`cd ~ && pwd`, (error, stdout, stderr) => {
+		if (error || stderr) {
+			console.error(`Couldn't get username: ${error}.`);
+			socket.emit('error', error);
+			//process.exit(73);
+		}
+		userHome = stdout;
+	});
 	socket.on('assemble', function (code) {
 		console.log(code);
-
 		exec(`rm -f code.c`, (error, stdout, stderr) => {
 			if (error || stderr) {
 				console.error(`cd failed: ${error}.`);
@@ -89,7 +127,6 @@ io.on('connection', function (socket) {
 					});
 				}
 			});
-
 			// if (language == "C") {
 			// }
 			// if (language == "RISC-V") {
@@ -109,37 +146,12 @@ io.on('connection', function (socket) {
 				socket.emit('error', error);
 				//process.exit(73);
 			}
-			run();
-			exec (`./vcd2js.pl dump.vcd`, (error3, stdout3, stderr3) => {
-				if (error3 || stderr3) {
-					console.error(`vcd2js failed: ${error3}.`);
-					socket.emit('error', error3);
-					//process.exit(73);
-				}
-				console.log(stdout3);
-				fs.writeFile("waveform-data.js", prefix+stdout3+suffix, function(err) {
-					if(err) {
-						return console.log(err);
-					}
-					exec(`cp -f waveform-data.js public/Scripts`,
-						(error4, stdout4, stderr4) => {
-							if (error4 || stderr4) {
-								console.error(`waveform-source store failed: ${error4}.`);
-								socket.emit('error', error4);
-								//process.exit(73);
-							}
-					});
-				});
-				socket.emit('response', stdout3);
-			});
+//			setTimeout(function() {stdout3 = readDump();socket.emit('response', stdout3);}, 3000);
 		});
 	});
-
 	socket.on('step', function (data) {
-		var client = new net.Socket();
-		client.connect(9001, '127.0.0.1', function() {
-			console.log('Connected to cpp socket');
-			client.write("ping from client");
-		});
+		var writeDump = `{"Order": "step", "runModeCode": 1, "programPath": "${filename}"}`;
+		console.log(writeDump);
+		client.write(writeDump);
 	});
 });
