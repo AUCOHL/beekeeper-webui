@@ -2,7 +2,12 @@ code.c
 code.txt
 BFM.c
 code.c.*
+*.bin
 *.bin_dump
 *.vcd
 *.v
+link.ld
+package-lock.json
+BFM.v
+soc.json
 

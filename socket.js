@@ -122,8 +122,9 @@ io.on("connection", function (socket) {
 							}
 							console.log("finished compilation");
 							socket.emit('finishedCompilation');
-							global.proc = spawn('vvp', ['-M/home/ahmed/BeekeeperSupport', '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
 							// vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
+							global.proc = spawn('vvp', ['-M/home/ahmed/BeekeeperSupport', '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
+                            // global.proc = spawn('beekeeper');
 							proc.stdin.setEncoding('utf-8');
 							proc.stdout.pipe(process.stdout);
 							// setTimeout(function(){ cppsocket.connect(9001, "127.0.0.1"); }, 1000);
@@ -138,7 +139,8 @@ io.on("connection", function (socket) {
 		if (proc !== 'undefined') {
             console.log("executing");
             socket.emit('response', storeVCD());
-            proc.stdin.write('run\n');
+            proc.stdin.write('run');
+            proc.stdin.end();
             // setTimeout(function(){ proc.stdin.write('SIGINT') }, 2000);
         } else {
             socket.emit('message', "Compile first");
@@ -174,14 +176,14 @@ io.on("connection", function (socket) {
 	socket.on('finish', function(code) {
 		// cppsocket.write(`${filename}.bin,4`);
 		if (proc !== 'undefined')
-		proc.stdin.write('finish\n');
-		// proc.stdin.end();
+		proc.stdin.write('exit\r');
+		proc.stdin.end();
 		socket.emit('response');
 	});
 	socket.on('break', function(code) {
 		// cppsocket.write(`${filename}.bin,5`);
 		if (proc !== 'undefined')
-		proc.stdin.write('run\n');
+		proc.stdin.write('break\n');
 		// proc.stdin.end();
 		socket.emit('response');
 	});
