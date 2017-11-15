@@ -25,7 +25,7 @@ socket.on('proceed', function() {
 			clicks = 1;
 			document.getElementById('step').click();
 		} else {
-			// window.open("waveform-viewer.html");
+			window.open("waveform-viewer.html");
 		}
 	};
 
@@ -37,7 +37,7 @@ socket.on('proceed', function() {
 			clicks = 1;
 			document.getElementById('stepi').click();
 		} else {
-			// window.open("waveform-viewer.html");
+			window.open("waveform-viewer.html");
 		}
 	};
 
