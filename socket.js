@@ -153,6 +153,8 @@ io.on("connection", function (socket) {
 		// cppsocket.write(`${filename}.bin,1`);
 		if (proc !== 'undefined') {
             proc.stdin.write('runff\n');
+			storeVCD();
+			socket.emit('response');
         } else {
             socket.emit('message', "Compile first");
         }
@@ -161,31 +163,37 @@ io.on("connection", function (socket) {
 	});
 	socket.on('step', function(code) {
 		// cppsocket.write(`${filename}.bin,2`);
-		if (proc !=='undefined')
-		proc.stdin.write('step\n');
+		if (proc !=='undefined') {
+			proc.stdin.write('step\n');
+			storeVCD();
+			socket.emit('response');
+		} else {
+            socket.emit('message', "Compile first");
+        }
 		// proc.stdin.end();
-		socket.emit('response');
 	});
 	socket.on('stepi', function(code) {
 		// cppsocket.write(`${filename}.bin,3`);
-		if (proc !== 'undefined')
-		proc.stdin.write('stepi\n');
+		if (proc !== 'undefined') {
+			proc.stdin.write('stepi\n');
+			storeVCD();
+			socket.emit('response');
+		} else {
+            socket.emit('message', "Compile first");
+        }
 		// proc.stdin.end();
-		socket.emit('response');
 	});
 	socket.on('finish', function(code) {
 		// cppsocket.write(`${filename}.bin,4`);
 		if (proc !== 'undefined')
 		proc.stdin.write('exit\r');
 		proc.stdin.end();
-		socket.emit('response');
 	});
 	socket.on('break', function(code) {
 		// cppsocket.write(`${filename}.bin,5`);
 		if (proc !== 'undefined')
 		proc.stdin.write('break\n');
 		// proc.stdin.end();
-		socket.emit('response');
 	});
 });
 

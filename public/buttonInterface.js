@@ -1,4 +1,5 @@
 var socket = io.connect('http://localhost:9000');
+var clicks = 0;
 
 socket.on('proceed', function() {
 	document.getElementById("compile").onclick = function (code) {
@@ -8,20 +9,36 @@ socket.on('proceed', function() {
 
 	document.getElementById('run').onclick = function () {
 		socket.emit('run');
+		// window.open("waveform-viewer.html");
 	};
 
 	document.getElementById('runff').onclick = function () {
 		socket.emit('runff');
+		// window.open("waveform-viewer.html");
 	};
 
 	document.getElementById('step').onclick = function () {
 		socket.emit('step');
-		window.open("waveform-viewer.html");
+		console.log("clicked");
+		if (clicks == 0) {
+			console.log("first click");
+			clicks = 1;
+			document.getElementById('step').click();
+		} else {
+			// window.open("waveform-viewer.html");
+		}
 	};
 
 	document.getElementById('stepi').onclick = function () {
 		socket.emit('stepi');
-		window.open("waveform-viewer.html");
+		console.log("clicked");
+		if (clicks == 0) {
+			console.log("first click");
+			clicks = 1;
+			document.getElementById('stepi').click();
+		} else {
+			// window.open("waveform-viewer.html");
+		}
 	};
 
 	document.getElementById('finish').onclick = function() {

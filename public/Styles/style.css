@@ -18,7 +18,7 @@ section {
     top: 10;
     height: 100%;
     left: 0;
-    width: 50%;
+    width: 100%;
     box-sizing: border-box;
     overflow: visible;
 }
@@ -47,6 +47,7 @@ section > select {
 }
 
 /* Side */
+/*
 main > aside {
     position: absolute;
     top: 0;
@@ -64,7 +65,6 @@ main > aside span {
     margin: 4px 3%;
 }
 
-/* Resizers */
 .grabberY {
     position: absolute;
     bottom: 0;
@@ -73,6 +73,7 @@ main > aside span {
     cursor: ns-resize;
     z-index: 40;
 }
+*/
 
 /* Header */
 header {
