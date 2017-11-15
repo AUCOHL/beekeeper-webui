@@ -17,6 +17,13 @@
             "programHere": true,
             "start": 0,
             "length": 4096
+        },
+        {
+            "id": "GPIO_0",
+            "owner": "Cloud-V",
+            "verilog": "GPIOSet",
+            "start": 4096,
+            "length": 8
         }
     ]
 }]

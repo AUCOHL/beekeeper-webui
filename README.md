@@ -5,7 +5,7 @@ In the process of figuring them out in a fresh environment. There are many :( ap
 ## Verilog-VCD
     https://metacpan.org/release/Verilog-VCD
 ## Program Dependencies
-    sudo apt install iverilog dos2unix npm
+    sudo apt install iverilog dos2unix npm libboost-all-dev rapidjson-dev libwebsocketpp-dev
 ## Module Dependencies
     npm install -g socket.io node-getopt
 ## Beekeeper
@@ -31,4 +31,4 @@ Note: Single click is at work here. It's working in the background there's just 
 	Add Beekeeper as submodule
 	Restructure to separate public and project
 	Implement auto syntax detection for C and RISC so the user doesn't have to choose.
-  Multiple source files and tabs
+    Multiple source files and tabs
