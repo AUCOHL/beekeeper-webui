@@ -108,7 +108,7 @@ io.on("connection", function (socket) {
 					socket.emit('error', err);
 			    } else {
 					console.log("The file was saved");
-					exec (`/home/ahmed/BeekeeperSupport/cc ${filename}`, (error1, stdout1, stderr1) => {
+					exec (`${userHome}BeekeeperSupport/cc ${filename}`, (error1, stdout1, stderr1) => {
 						if (error1 || stderr1) {
 							console.error(`cc failed: ${error1}.`);
 							socket.emit('error', error1);
@@ -123,7 +123,7 @@ io.on("connection", function (socket) {
 							console.log("finished compilation");
 							socket.emit('finishedCompilation');
 							// vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
-							global.proc = spawn('vvp', ['-M/home/ahmed/BeekeeperSupport', '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
+							global.proc = spawn('vvp', [`-M${userHome}BeekeeperSupport`, '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
                             // global.proc = spawn('beekeeper');
 							proc.stdin.setEncoding('utf-8');
 							proc.stdout.pipe(process.stdout);
