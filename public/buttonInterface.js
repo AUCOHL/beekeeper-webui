@@ -1,52 +1,79 @@
 var socket = io.connect('http://localhost:9000');
 var clicks = 0;
+var compiled = false;
 
 socket.on('proceed', function() {
 	document.getElementById("compile").onclick = function (code) {
 		var code = editor.getValue();
+		clicks = 0;
+		compiled = true;
 		socket.emit('compile', code);
 	};
 
 	document.getElementById('run').onclick = function () {
-		socket.emit('run');
+		if (compiled) {
+			socket.emit('run');
+			setTimeout(function(){ window.open("waveform-viewer.html"); }, 2000);
+		} else {
+			alert("Please Compile First");
+		}
 		// window.open("waveform-viewer.html");
 	};
 
 	document.getElementById('runff').onclick = function () {
-		socket.emit('runff');
+		if (compiled) {
+			socket.emit('runff');
+			setTimeout(function(){ window.open("waveform-viewer.html"); }, 2000);
+		} else {
+			alert("Please Compile First");
+		}
 		// window.open("waveform-viewer.html");
 	};
 
 	document.getElementById('step').onclick = function () {
-		socket.emit('step');
-		console.log("clicked");
-		if (clicks == 0) {
-			console.log("first click");
-			clicks = 1;
-			document.getElementById('step').click();
+		if (compiled) {
+			socket.emit('step');
+			console.log("clicked");
+			if (clicks == 0) {
+				console.log("first click");
+				clicks = 1;
+				socket.emit('stepi');
+			}
+		 	setTimeout(function(){ window.open("waveform-viewer.html"); }, 2000);
 		} else {
-			window.open("waveform-viewer.html");
+			alert("Please Compile First");
 		}
 	};
 
 	document.getElementById('stepi').onclick = function () {
-		socket.emit('stepi');
-		console.log("clicked");
-		if (clicks == 0) {
-			console.log("first click");
-			clicks = 1;
-			document.getElementById('stepi').click();
+		if (compiled) {
+			socket.emit('stepi');
+			console.log("clicked");
+			if (clicks == 0) {
+				console.log("first click");
+				clicks = 1;
+				socket.emit('stepi');
+			}
+			setTimeout(function(){ window.open("waveform-viewer.html"); }, 2000);
 		} else {
-			window.open("waveform-viewer.html");
+			alert("Please Compile First");
 		}
 	};
 
 	document.getElementById('finish').onclick = function() {
-		socket.emit('finish');
+		if (compiled) {
+			socket.emit('finish');
+		} else {
+			alert("Please Compile First");
+		}
 	}
 
 	document.getElementById('break').onclick = function() {
-		socket.emit('break');
+		if (compiled) {
+			socket.emit('break');
+		} else {
+			alert("Please Compile First");
+		}
 	}
 });
 

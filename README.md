@@ -5,7 +5,7 @@ In the process of figuring them out in a fresh environment. There are many :( ap
 ## Verilog-VCD
     https://metacpan.org/release/Verilog-VCD
 ## Program Dependencies
-    sudo apt install iverilog dos2unix npm libboost-all-dev rapidjson-dev libwebsocketpp-dev
+    sudo apt install iverilog dos2unix npm
 ## Module Dependencies
     npm install -g socket.io node-getopt
 ## Beekeeper
@@ -25,10 +25,8 @@ Open Index.html in folder public, that's it, go ahead.
 Note: Single click is at work here. It's working in the background there's just no loading screen, will add.
 
 # Not working
-  Only compiling at the moment.
+    Only running at the moment.
 # Future
 	Add loading spinner for buttons
-	Add Beekeeper as submodule
-	Restructure to separate public and project
 	Implement auto syntax detection for C and RISC so the user doesn't have to choose.
     Multiple source files and tabs
