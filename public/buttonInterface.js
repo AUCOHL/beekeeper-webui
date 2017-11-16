@@ -13,21 +13,19 @@ socket.on('proceed', function() {
 	document.getElementById('run').onclick = function () {
 		if (compiled) {
 			socket.emit('run');
-			setTimeout(function(){ window.open("waveform-viewer.html"); }, 2000);
+			setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
 			alert("Please Compile First");
 		}
-		// window.open("waveform-viewer.html");
 	};
 
 	document.getElementById('runff').onclick = function () {
 		if (compiled) {
 			socket.emit('runff');
-			setTimeout(function(){ window.open("waveform-viewer.html"); }, 2000);
+			setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
 			alert("Please Compile First");
 		}
-		// window.open("waveform-viewer.html");
 	};
 
 	document.getElementById('step').onclick = function () {
@@ -39,7 +37,7 @@ socket.on('proceed', function() {
 				clicks = 1;
 				socket.emit('stepi');
 			}
-		 	setTimeout(function(){ window.open("waveform-viewer.html"); }, 2000);
+		 	setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
 			alert("Please Compile First");
 		}
@@ -54,7 +52,7 @@ socket.on('proceed', function() {
 				clicks = 1;
 				socket.emit('stepi');
 			}
-			setTimeout(function(){ window.open("waveform-viewer.html"); }, 2000);
+			setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
 			alert("Please Compile First");
 		}

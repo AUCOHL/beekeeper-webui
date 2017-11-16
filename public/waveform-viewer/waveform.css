@@ -49,8 +49,18 @@
 
 .canvas-viewport {
     position: absolute;
-    max-height: 90%;
+    max-height: 75%;
     overflow-x: hidden;
     overflow-y: auto;
     outline: none
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    height: 25%;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    background-color: black;
 }

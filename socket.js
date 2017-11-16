@@ -114,7 +114,7 @@ io.on("connection", function (socket) {
 							socket.emit('error', error1);
 							process.exit(73);
 						}
-						exec (`iverilog -o code.c.bin_dump/Beekeeper.vvp -I/home/ahmed/BeekeeperSupport/ BFM.v`, (error3, stdout3, stderr3) => {
+						exec (`iverilog -o code.c.bin_dump/Beekeeper.vvp -I${userHome}/BeekeeperSupport/ BFM.v`, (error3, stdout3, stderr3) => {
 							if (error3 || stderr3) {
 								console.error(`iverilog failed: ${error3}.`);
 								socket.emit('error', error3);

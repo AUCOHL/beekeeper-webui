@@ -1,15 +1,16 @@
 # Dependencies
-In the process of figuring them out in a fresh environment. There are many :( apparently a bad programmer is at work here
+Install all listed items.
 ## node
     https://nodejs.org/en/download/package-manager/
 ## Verilog-VCD
+    You will need to make and install Verilog::VCD, there's no way around this it's required by vcd2js.
     https://metacpan.org/release/Verilog-VCD
 ## Program Dependencies
     sudo apt install iverilog dos2unix npm
 ## Module Dependencies
     npm install -g socket.io node-getopt
 ## Beekeeper
-All dependencies required for Beekeeper must be met. A working Installation of Beekeeper must exist in user home directory root.
+All dependencies required for Beekeeper must be met. A working Installation of Beekeeper must be installed in user home directory.
 
 # Installation
 Must place the project root under /home/$USER/bin/
