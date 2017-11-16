@@ -12,6 +12,7 @@ Install all listed items.
 ## Beekeeper
 All dependencies required for Beekeeper must be met.
 A working Installation of Beekeeper must be installed in user home directory.
+Warning: When choosing Beekeeper installation directory don't place a trailing slash at the end of path.
 
 # Usage
 	cd <project-root-directory>
