@@ -10,11 +10,9 @@ Install all listed items.
 ## Module Dependencies
     npm install -g socket.io node-getopt
 ## Beekeeper
-All dependencies required for Beekeeper must be met. A working Installation of Beekeeper must be installed in user home directory.
+All dependencies required for Beekeeper must be met.
+A working Installation of Beekeeper must be installed in user home directory.
 
-# Installation
-Must place the project root under /home/$USER/bin/
-Beekeeper commit fa480a2 is placed inside the root project folder
 # Usage
 	cd <project-root-directory>
 	node socket.js
