@@ -22,9 +22,13 @@ waveform.setOnChangeListener(function(e){
 	console.log(e);
 });
 `;
-var out = "";
+var out="";
 var workingDirectory="";
+var directory="";
 var userHome="";
+var home="";
+var uname="";
+var name="";
 var filename = "code.c";
 
 process.stdin.resume(); //so the program will not close instantly
@@ -69,14 +73,15 @@ function storeVCD() {
 
 io.on("connection", function (socket) {
 	socket.emit('proceed', { state: 'fine' });
-	var uname="";
+
 	exec (`echo "$USER"`, (error, stdout, stderr) => {
 		if (error || stderr) {
 			console.error(`Couldn't get username: ${error}.`);
 			socket.emit('error', error);
 			//process.exit(73);
 		}
-		uname = stdout;
+		name = stdout;
+		uname = name.trim();
 	});
 	exec (`pwd`, (error, stdout, stderr) => {
 		if (error || stderr) {
@@ -84,7 +89,8 @@ io.on("connection", function (socket) {
 			socket.emit('error', error);
 			//process.exit(73);
 		}
-		workingDirectory = stdout;
+		directory = stdout;
+		workingDirectory = directory.trim() + "/";
 	});
 	exec (`cd ~ && pwd`, (error, stdout, stderr) => {
 		if (error || stderr) {
@@ -92,7 +98,8 @@ io.on("connection", function (socket) {
 			socket.emit('error', error);
 			//process.exit(73);
 		}
-		userHome = stdout;
+		home = stdout;
+		userHome = home.trim() + "/";
 	});
 	socket.on('compile', function (code) {
 		console.log(code);
