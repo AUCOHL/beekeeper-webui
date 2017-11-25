@@ -19,8 +19,11 @@
     <div id="waveform-container"></div>
     <script type="text/javascript" src="Scripts/waveform-data.js"></script>
     <footer>
-        <select id='instructionScreen'></select>
+        <p id="waveform-text"></p>
+        <script type="text/javascript" src="Scripts/waveform-text.js"></script>
+        <script type="text/javascript" >
+            document.getElementById('waveform-text').innerHTML = data;
+        </script>
     </footer>
-
 </body>
 </html>

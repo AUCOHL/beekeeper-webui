@@ -3,6 +3,12 @@ var clicks = 0;
 var compiled = false;
 
 socket.on('proceed', function() {
+
+	document.getElementById("save").onclick = function (code) {
+		var code = editor.getValue();
+		socket.emit('save', code);
+	};
+
 	document.getElementById("compile").onclick = function (code) {
 		var code = editor.getValue();
 		clicks = 0;
@@ -35,7 +41,7 @@ socket.on('proceed', function() {
 			if (clicks == 0) {
 				console.log("first click");
 				clicks = 1;
-				socket.emit('stepi');
+				// socket.emit('stepi');
 			}
 		 	setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
@@ -50,7 +56,7 @@ socket.on('proceed', function() {
 			if (clicks == 0) {
 				console.log("first click");
 				clicks = 1;
-				socket.emit('stepi');
+				// socket.emit('stepi');
 			}
 			setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
@@ -73,9 +79,17 @@ socket.on('proceed', function() {
 			alert("Please Compile First");
 		}
 	}
+
+	document.getElementById('waveform').onclick = function () {
+		if (compiled) {
+			window.open("waveform-viewer.html");
+		} else {
+			alert("Please Compile First");
+		}
+	};
 });
 
-socket.on('respone', function() {
+socket.on('respone', function(data) {
 	console.log("response received");
 });
 
