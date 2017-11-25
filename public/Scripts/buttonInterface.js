@@ -1,44 +1,98 @@
 var socket = io.connect('http://localhost:9000');
+var clicks = 0;
+var compiled = false;
 
 socket.on('proceed', function() {
+
+	document.getElementById("save").onclick = function (code) {
+		var code = editor.getValue();
+		socket.emit('save', code);
+	};
+
 	document.getElementById("compile").onclick = function (code) {
 		var code = editor.getValue();
+		clicks = 0;
+		compiled = true;
 		socket.emit('compile', code);
 	};
 
 	document.getElementById('run').onclick = function () {
-		socket.emit('run');
+		if (compiled) {
+			socket.emit('run');
+			// setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
+		} else {
+			alert("Please Compile First");
+		}
 	};
 
 	document.getElementById('runff').onclick = function () {
-		socket.emit('runff');
+		if (compiled) {
+			socket.emit('runff');
+			// setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
+		} else {
+			alert("Please Compile First");
+		}
 	};
 
 	document.getElementById('step').onclick = function () {
-		socket.emit('step');
-		window.open("waveform-viewer.html");
+		if (compiled) {
+			socket.emit('step');
+			if (clicks == 0) {
+				console.log("first click");
+				clicks = 1;
+			}
+			// 	setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
+		} else {
+			alert("Please Compile First");
+		}
 	};
 
 	document.getElementById('stepi').onclick = function () {
-		socket.emit('stepi');
-		window.open("waveform-viewer.html");
+		if (compiled) {
+			socket.emit('stepi');
+			console.log("clicked");
+			if (clicks == 0) {
+				console.log("first click");
+				clicks = 1;
+			}
+			// setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
+		} else {
+			alert("Please Compile First");
+		}
 	};
 
 	document.getElementById('finish').onclick = function() {
-		socket.emit('finish');
+		if (compiled) {
+			socket.emit('finish');
+		} else {
+			alert("Please Compile First");
+		}
 	}
 
 	document.getElementById('break').onclick = function() {
-		socket.emit('break');
+		if (compiled) {
+			socket.emit('break');
+		} else {
+			alert("Please Compile First");
+		}
 	}
+
+	document.getElementById('waveform').onclick = function () {
+		if (compiled) {
+			window.open("waveform-viewer.html");
+		} else {
+			alert("Please Compile First");
+		}
+	};
 });
 
-socket.on('respone', function() {
-	console.log("response received");
+socket.on('response', function() {
+	// alert("got response");
+	window.open("waveform-viewer.html");
 });
 
 socket.on('finishedCompilation', function() {
-	alert("Compiled!");
+	alert("Compiled");
 });
 
 socket.on('error', function(data) {

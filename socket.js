@@ -51,7 +51,6 @@ function storeVCD() {
 			socket.emit('error', error3);
 		}
 		var out =  prefix+stdout3+suffix;
-		// console.log(out);
 		fs.writeFile("waveform-data.js",out, function(err) {
 			if(err) {
 				return console.log(err);
@@ -71,31 +70,6 @@ function storeVCD() {
 
 io.on("connection", function (socket) {
 	socket.emit('proceed', { state: 'fine' });
-
-	exec (`echo "$USER"`, (error, stdout, stderr) => {
-		if (error || stderr) {
-			console.error(`Couldn't get username: ${error}.`);
-			socket.emit('error', error);
-		}
-		name = stdout;
-		uname = name.trim();
-	});
-	exec (`pwd`, (error, stdout, stderr) => {
-		if (error || stderr) {
-			console.error(`Couldn't get workingDirectory: ${error}.`);
-			socket.emit('error', error);
-		}
-		directory = stdout;
-		workingDirectory = directory.trim() + "/";
-	});
-	exec (`cd ~ && pwd`, (error, stdout, stderr) => {
-		if (error || stderr) {
-			console.error(`Couldn't get username: ${error}.`);
-			socket.emit('error', error);
-		}
-		home = stdout;
-		userHome = home.trim() + "/";
-	});
 
 	socket.on('save', function (code) {
 		console.log(code);
@@ -120,7 +94,7 @@ io.on("connection", function (socket) {
 				console.error(`cd failed: ${error}.`);
 				socket.emit('error', error);
 			}
-			fs.writeFile("code.c", code, function(err) {
+			fs.writeFile(filename, code, function(err) {
 			    if(err) {
 					console.log(err);
 					socket.emit('error', err);
@@ -130,43 +104,45 @@ io.on("connection", function (socket) {
 						if (error1 || stderr1) {
 							console.error(`cc failed: ${error1}.`);
 							socket.emit('error', error1);
-							process.exit(73);
 						}
 						// run samplesoc
 						exec (`cp -f /usr/local/bin/BeekeeperSupport/Compiler/examplesoc.json soc.json`, (error, stdout, stderr) => {
 							if (error || stderr) {
-								console.error(`Couldn't get username: ${error}.`);
+								console.error(`Couldn't copy samplesoc: ${error}.`);
 								socket.emit('error', error);
 							}
 							// run makesoc
 							exec (`/usr/local/bin/BeekeeperSupport/makesoc soc.json`, (error, stdout, stderr) => {
 								if (error || stderr) {
-									console.error(`Couldn't get username: ${error}.`);
+									console.error(`Couldn't makesoc: ${error}.`);
 									socket.emit('error', error);
 								}
+								// build
 								exec (`iverilog -o code.c.bin_dump/Beekeeper.vvp -I/usr/local/bin/BeekeeperSupport/ BFM.v`, (error3, stdout3, stderr3) => {
 									if (error3 || stderr3) {
 										console.error(`iverilog failed: ${error3}.`);
 										socket.emit('error', error3);
-										process.exit(73);
 									}
 									console.log("finished compilation");
-									socket.emit('finishedCompilation');
 									// vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
 									global.proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
 		                           	proc.stdin.setEncoding('utf-8');
 									// proc.stdout.pipe(process.stdout);
 									proc.stdout.on('data', (data) => {
-									  // console.log(`child stdout:\n${data}`);
-									  processData = data;
-									  fs.writeFile("public/Scripts/waveform-text.js", "var data=`" + data + "`;", function(err) {
-										  if(err) {
-											  console.log(err);
-											  socket.emit('error', err);
-										  }
-									  });
+										if (data.indexOf("JAL zero, 0") > -1) {
+											proc.kill();
+										} else {
+											processData = data;
+											fs.writeFile("public/Scripts/waveform-text.js", "var data=`" + data + "`;", function(err) {
+												  if(err) {
+													  console.log(err);
+													  socket.emit('error', err);
+												  }
+											});
+										}
 									});
-									setTimeout(function(){ proc.stdin.write('code.c.bin\n'); }, 1000);
+									socket.emit('finishedCompilation');
+									setTimeout(function(){ proc.stdin.write('code.c.bin\n'); }, 500);
 								});
 							});
 						});
@@ -178,30 +154,28 @@ io.on("connection", function (socket) {
 
 	socket.on('run', function(code) {
 		if (proc !== 'undefined') {
-            console.log("executing");
-            socket.emit('response', storeVCD());
-            proc.stdin.write('run');
-            proc.stdin.end();
+			proc.stdin.write('run\n');
+			setTimeout(function(){ storeVCD(); socket.emit('response'); }, 5000);
         } else {
             socket.emit('message', "Compile first");
         }
-        if (stdout) socket.emit('response');
 	});
+
 	socket.on('runff', function(code) {
 		if (proc !== 'undefined') {
             proc.stdin.write('runff\n');
-			storeVCD();
-			socket.emit('response', 'runff');
+			setTimeout(function(){ storeVCD(); socket.emit('response'); }, 5000);
         } else {
             socket.emit('message', "Compile first");
         }
 	});
+
 	socket.on('step', function(code) {
 		if (proc !=='undefined') {
 			proc.stdin.write('step\n');
 			console.log('step');
 			storeVCD();
-			socket.emit('response', processData);
+			socket.emit('response');
 		} else {
             socket.emit('message', "Compile first");
         }
@@ -212,7 +186,7 @@ io.on("connection", function (socket) {
 			proc.stdin.write('stepi\n');
 			console.log('stepi');
 			storeVCD();
-			socket.emit('response', processData);
+			socket.emit('response');
 		} else {
             socket.emit('message', "Compile first");
         }
@@ -239,12 +213,12 @@ function exitHandler(options, err) {
 	}
 }
 
-//do something when app is closing
-process.on('exit', exitHandler.bind(null,{exit:true}));
-//catches ctrl+c event
-process.on('SIGINT', exitHandler.bind(null, {exit:true}));
-// catches "kill pid" (for example: nodemon restart)
-process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
-process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
-//catches uncaught exceptions
-process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+// //do something when app is closing
+// process.on('exit', exitHandler.bind(null,{exit:true}));
+// //catches ctrl+c event
+// process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+// // catches "kill pid" (for example: nodemon restart)
+// process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
+// process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
+// //catches uncaught exceptions
+// process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
