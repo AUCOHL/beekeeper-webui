@@ -2,12 +2,24 @@ var socket = io.connect('http://localhost:9000');
 var clicks = 0;
 var compiled = false;
 
+$body = $("body");
+
+$(document).on({
+    ajaxStart: function() { $body.addClass("loading");    },
+     ajaxStop: function() { $body.removeClass("loading"); }
+});
+
+// Initiates an AJAX request on click
+$(document).on("click", function(){
+    $.get("/mockjax");
+});
+
 socket.on('proceed', function() {
 
-	document.getElementById("save").onclick = function (code) {
-		var code = editor.getValue();
-		socket.emit('save', code);
-	};
+	// document.getElementById("save").onclick = function (code) {
+	// 	var code = editor.getValue();
+	// 	socket.emit('save', code);
+	// };
 
 	document.getElementById("compile").onclick = function (code) {
 		var code = editor.getValue();
@@ -25,14 +37,14 @@ socket.on('proceed', function() {
 		}
 	};
 
-	document.getElementById('runff').onclick = function () {
-		if (compiled) {
-			socket.emit('runff');
-			// setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
-		} else {
-			alert("Please Compile First");
-		}
-	};
+	// document.getElementById('runff').onclick = function () {
+	// 	if (compiled) {
+	// 		socket.emit('runff');
+	// 		// setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
+	// 	} else {
+	// 		alert("Please Compile First");
+	// 	}
+	// };
 
 	document.getElementById('step').onclick = function () {
 		if (compiled) {
@@ -69,13 +81,13 @@ socket.on('proceed', function() {
 		}
 	}
 
-	document.getElementById('break').onclick = function() {
-		if (compiled) {
-			socket.emit('break');
-		} else {
-			alert("Please Compile First");
-		}
-	}
+	// document.getElementById('break').onclick = function() {
+	// 	if (compiled) {
+	// 		socket.emit('break');
+	// 	} else {
+	// 		alert("Please Compile First");
+	// 	}
+	// }
 
 	document.getElementById('waveform').onclick = function () {
 		if (compiled) {
@@ -89,6 +101,11 @@ socket.on('proceed', function() {
 socket.on('response', function() {
 	// alert("got response");
 	window.open("waveform-viewer.html");
+});
+
+socket.on('finished', function() {
+	// alert("got response");
+    alert("Program finished");
 });
 
 socket.on('finishedCompilation', function() {

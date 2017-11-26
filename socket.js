@@ -129,6 +129,7 @@ io.on("connection", function (socket) {
 		                           	proc.stdin.setEncoding('utf-8');
 									// proc.stdout.pipe(process.stdout);
 									proc.stdout.on('data', (data) => {
+										global.data = data;
 										if (data.indexOf("JAL zero, 0") > -1) {
 											proc.kill();
 										} else {
@@ -173,9 +174,13 @@ io.on("connection", function (socket) {
 	socket.on('step', function(code) {
 		if (proc !=='undefined') {
 			proc.stdin.write('step\n');
-			console.log('step');
-			storeVCD();
-			socket.emit('response');
+			if (data.indexOf("JAL zero, 0") > -1) {
+				socket.emit('finished');
+			} else {
+				console.log('step');
+				storeVCD();
+				socket.emit('response');
+			}
 		} else {
             socket.emit('message', "Compile first");
         }
@@ -184,9 +189,13 @@ io.on("connection", function (socket) {
 	socket.on('stepi', function(code) {
 		if (proc !== 'undefined') {
 			proc.stdin.write('stepi\n');
-			console.log('stepi');
-			storeVCD();
-			socket.emit('response');
+			if (data.indexOf("JAL zero, 0") > -1) {
+				socket.emit('finished');
+			} else {
+				console.log('stepi');
+				storeVCD();
+				socket.emit('response');
+			}
 		} else {
             socket.emit('message', "Compile first");
         }
