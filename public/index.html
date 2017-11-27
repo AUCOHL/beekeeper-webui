@@ -24,15 +24,17 @@
             </script>
             <section>
 				<div id="toolbar" class="toolbar">
-                    <!-- <a href='javascript:void(0)'id="save"><img src='Images/save.svp'/><span class='tooltip'>Save</span></a> -->
-					<a href='javascript:void(0)'id="compile"><img src='Images/compile.svg'/><span class='tooltip'>Compile Code</span></a>
-					<a href='javascript:void(0)'id="run"><img src='Images/run.svg'/><span class='tooltip'>Run</span></a>
-                    <!-- <a href='javascript:void(0)'id="runff"><img src='Images/run.ff.svg'/><span class='tooltip'>Run ignoring breakpoints</span></a> -->
-					<a href='javascript:void(0)'id="step"><img src='Images/step.svg'/><span class='tooltip'>Step</span></a>
-                    <a href='javascript:void(0)'id="stepi"><img src='Images/stepi.svg'/><span class='tooltip'>Step Instruction</span></a>
-                    <a href='javascript:void(0)'id="finish"><img src='Images/finish.svg'/><span class='tooltip'>Finish</span></a>
-                    <!-- <a href='javascript:void(0)'id="break"><img src='Images/step.png'/><span class='tooltip'>Break</span></a> -->
-                    <a href='javascript:void(0)'id="waveform"><img src='Images/waveform.svg'/><span class='tooltip'>Waveform</span></a>
+                    <button class="toolbar-button" id="save">Save</button>
+					<button class="toolbar-button" id="compile">Compile</button>
+					<button class="toolbar-button" id="run">Run</button>
+                    <!-- <button id="runff">Run ignoring breakpoints</button> -->
+					<button class="toolbar-button" id="step">Step</button>
+                    <button class="toolbar-button" id="stepi">Step Instruction</button>
+                    <!-- <button id="finish">Finish</button>
+                    <button id="break">Break</button> -->
+                    <button class="toolbar-button" id="waveform">Waveform</button>
+                    <!-- The actual snackbar -->
+                    <div id="snackbar"></div>
 				</div>
 				<div id="editor"></div>
 				<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>

@@ -1,27 +1,25 @@
 var socket = io.connect('http://localhost:9000');
+run = false;
 var clicks = 0;
 var compiled = false;
 
-$body = $("body");
-
-$(document).on({
-    ajaxStart: function() { $body.addClass("loading");    },
-     ajaxStop: function() { $body.removeClass("loading"); }
-});
-
-// Initiates an AJAX request on click
-$(document).on("click", function(){
-    $.get("/mockjax");
-});
+document.getElementById("run").disabled = true;
+document.getElementById("step").disabled = true;
+document.getElementById("stepi").disabled = true;
+document.getElementById("waveform").disabled = true;
 
 socket.on('proceed', function() {
 
-	// document.getElementById("save").onclick = function (code) {
-	// 	var code = editor.getValue();
-	// 	socket.emit('save', code);
-	// };
+	document.getElementById("save").onclick = function (code) {
+		showSnack("File saved");
+		var code = editor.getValue();
+		socket.emit('save', code);
+	};
 
 	document.getElementById("compile").onclick = function (code) {
+        document.getElementById("run").disabled = false;
+        document.getElementById("step").disabled = false;
+        document.getElementById("stepi").disabled = false;
 		var code = editor.getValue();
 		clicks = 0;
 		compiled = true;
@@ -30,8 +28,8 @@ socket.on('proceed', function() {
 
 	document.getElementById('run').onclick = function () {
 		if (compiled) {
+			run = true;
 			socket.emit('run');
-			// setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
 			alert("Please Compile First");
 		}
@@ -49,11 +47,6 @@ socket.on('proceed', function() {
 	document.getElementById('step').onclick = function () {
 		if (compiled) {
 			socket.emit('step');
-			if (clicks == 0) {
-				console.log("first click");
-				clicks = 1;
-			}
-			// 	setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
 			alert("Please Compile First");
 		}
@@ -62,24 +55,18 @@ socket.on('proceed', function() {
 	document.getElementById('stepi').onclick = function () {
 		if (compiled) {
 			socket.emit('stepi');
-			console.log("clicked");
-			if (clicks == 0) {
-				console.log("first click");
-				clicks = 1;
-			}
-			// setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
 		} else {
 			alert("Please Compile First");
 		}
 	};
 
-	document.getElementById('finish').onclick = function() {
-		if (compiled) {
-			socket.emit('finish');
-		} else {
-			alert("Please Compile First");
-		}
-	}
+	// document.getElementById('finish').onclick = function() {
+	// 	if (compiled) {
+	// 		socket.emit('finish');
+	// 	} else {
+	// 		alert("Please Compile First");
+	// 	}
+	// }
 
 	// document.getElementById('break').onclick = function() {
 	// 	if (compiled) {
@@ -90,26 +77,34 @@ socket.on('proceed', function() {
 	// }
 
 	document.getElementById('waveform').onclick = function () {
-		if (compiled) {
-			window.open("waveform-viewer.html");
-		} else {
-			alert("Please Compile First");
-		}
+		window.open("waveform-viewer.html");
 	};
 });
 
+function showSnack(text) {
+	console.log("showSnack");
+	var x = document.getElementById("snackbar")
+	x.innerHTML = text;
+	x.className = "show";
+	setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
 socket.on('response', function() {
-	// alert("got response");
 	window.open("waveform-viewer.html");
 });
 
-socket.on('finished', function() {
-	// alert("got response");
-    alert("Program finished");
+socket.on('complete', function() {
+    console.log("received complete signal");
+    document.getElementById("run").disabled = true;
+    document.getElementById("step").disabled = true;
+    document.getElementById("stepi").disabled = true;
+    document.getElementById("waveform").disabled = false;
+	if (run) document.getElementById("waveform").click();
+    showSnack("Program finished");
 });
 
 socket.on('finishedCompilation', function() {
-	alert("Compiled");
+	showSnack("Compiled successfully");
 });
 
 socket.on('error', function(data) {
@@ -117,5 +112,5 @@ socket.on('error', function(data) {
 });
 
 socket.on('message', function(data) {
-	alert(`${data}`);
+	showSnack(`${data}`);
 });

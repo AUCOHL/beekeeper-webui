@@ -25,25 +25,15 @@ section {
 
 #toolbar {
 	background-color: #2C2E31;
+    height: 35px;
 }
 
 section > #editor {
     position: absolute;
-    top: 36px;
+    top: 35px;
     bottom: 0;
     width: 100%;
 	font-family: monospace;
-}
-
-/* Section Side */
-section > select {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    border: none;
-    padding: 0.5em;
-    z-index: 2;
-    margin-right: 16px;
 }
 
 .modal {
@@ -86,15 +76,6 @@ header img {
     transition: transform 0.3s ease-in-out;
 }
 
-/* Tool Selector */
-header > select {
-    float: right;
-    height: 100%;
-    padding: 0 1em;
-    border: none;
-    color: #eee;
-}
-
 header > div {
     position: relative;
     display: inline-block;
@@ -106,7 +87,7 @@ header > div {
     vertical-align: top;
 }
 
-header > div > span {
+/*header > div > span {
     padding: 0.75em 2em;
     margin: 0;
     height: 100%;
@@ -118,7 +99,7 @@ header > div > span {
     transition: background-color 0.5s ease, color 0.5s ease;
     cursor: pointer;
     vertical-align: middle;
-}
+}*/
 
 header > div > div {
     display: none;
@@ -131,10 +112,6 @@ header > div > div {
     left: 0;
     box-sizing: border-box;
     box-shadow: 0 0 8px black;
-}
-
-header > div > div .menuSection {
-    border-bottom: 1px solid rgba(0,0,0,0.3);
 }
 
 header > div:hover > div {
@@ -159,34 +136,51 @@ header > div > div > a:hover, header > div > div > label:hover {
     padding-left: 2em;
 }
 
-.tooltip {
-	padding: 8px 12px;
-	position: absolute;
-	top: 40px;
-	left: 50%;
-	width: 104px;
-	z-index: 88;
-	box-sizing: border-box;
-	margin-left: -56px;
-	text-align: center;
-	font-size: 12px;
-	border-radius: 8px;
-	visibility: hidden;
-	opacity: 0;
-    transition: opacity 1s;
+.toolbar-button {
+    margin-top: 5px;
+    height: 25px;
+    color: white;
+    text-align: center;
 }
 
-a:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
-}
-
-.tooltip::before {
-    content: " ";
-    position: absolute;
-    bottom: 100%; /* At the bottom of the tooltip */
+#snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
     left: 50%;
-    margin-left: -2px;
-    border-width: 5px;
-    border-style: solid;
+    bottom: 30px;
+    font-size: 17px;
+}
+
+#snackbar.show {
+    visibility: visible;
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@-webkit-keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
 }

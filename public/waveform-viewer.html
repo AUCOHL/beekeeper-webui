@@ -22,7 +22,20 @@
         <p id="waveform-text"></p>
         <script type="text/javascript" src="Scripts/waveform-text.js"></script>
         <script type="text/javascript" >
-            document.getElementById('waveform-text').innerHTML = data;
+            var clean = "";
+            var instruction = "";
+            data = data.substr(0, data.indexOf("(beekeeper)"));
+            if (data.indexOf("Running") > -1) {
+                instruction = data.subster(data.indexOf("... ") + 4, data.indexOf("["));
+            } else {
+                instruction = data.substr(0, data.indexOf("["));
+            }
+            var clean = data.substr(0, data.indexOf("(beekeeper)"));
+            var address = data.substr(data.indexOf("["), data.indexOf("]"));
+            console.log(address);
+            console.log(instruction);
+            var text = address + "<br/>" + instruction;
+            document.getElementById('waveform-text').innerHTML = text;
         </script>
     </footer>
 </body>

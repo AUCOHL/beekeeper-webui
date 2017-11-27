@@ -28,6 +28,7 @@ var filename = "code.c";
 var firstStep = true;
 var processData = "";
 var processError = "";
+var stepping = false;
 
 //so the program will not close instantly
 process.stdin.resume();
@@ -131,6 +132,10 @@ io.on("connection", function (socket) {
 									proc.stdout.on('data', (data) => {
 										global.data = data;
 										if (data.indexOf("JAL zero, 0") > -1) {
+											if (true) {
+												storeVCD();
+												socket.emit("complete");
+											}
 											proc.kill();
 										} else {
 											processData = data;
@@ -156,7 +161,6 @@ io.on("connection", function (socket) {
 	socket.on('run', function(code) {
 		if (proc !== 'undefined') {
 			proc.stdin.write('run\n');
-			setTimeout(function(){ storeVCD(); socket.emit('response'); }, 5000);
         } else {
             socket.emit('message', "Compile first");
         }
@@ -165,7 +169,7 @@ io.on("connection", function (socket) {
 	socket.on('runff', function(code) {
 		if (proc !== 'undefined') {
             proc.stdin.write('runff\n');
-			setTimeout(function(){ storeVCD(); socket.emit('response'); }, 5000);
+			setTimeout(function(){ storeVCD(); socket.emit('response'); socket.emit("complete");}, 5000);
         } else {
             socket.emit('message', "Compile first");
         }
@@ -173,14 +177,11 @@ io.on("connection", function (socket) {
 
 	socket.on('step', function(code) {
 		if (proc !=='undefined') {
+			stepping = true;
 			proc.stdin.write('step\n');
-			if (data.indexOf("JAL zero, 0") > -1) {
-				socket.emit('finished');
-			} else {
-				console.log('step');
-				storeVCD();
-				socket.emit('response');
-			}
+			console.log('step');
+			storeVCD();
+			socket.emit('response');
 		} else {
             socket.emit('message', "Compile first");
         }
@@ -188,14 +189,11 @@ io.on("connection", function (socket) {
 
 	socket.on('stepi', function(code) {
 		if (proc !== 'undefined') {
+			stepping = true;
 			proc.stdin.write('stepi\n');
-			if (data.indexOf("JAL zero, 0") > -1) {
-				socket.emit('finished');
-			} else {
-				console.log('stepi');
-				storeVCD();
-				socket.emit('response');
-			}
+			console.log('stepi');
+			storeVCD();
+			socket.emit('response');
 		} else {
             socket.emit('message', "Compile first");
         }
