@@ -19,6 +19,8 @@ waveform.setOnChangeListener(function(e){
 var out="";
 
 var workingDirectory="";
+var step = 0;
+var codeLine = "";
 var directory="";
 var userHome="";
 var home="";
@@ -167,10 +169,14 @@ io.on("connection", function (socket) {
 								            var address = processData.substring(processData.indexOf("["), processData.indexOf("]"));
 											// cleanup address
 								            if (address.indexOf("code.c") > -1) {
-								                address = "[" + address.substring(address.indexOf(' ') + 1, address.length)+"]";
+												step = parseInt(address.substring(address.indexOf('code.c:') + "code.c:".length, address.indexOf(' ')));
+											    address = "[" + address.substring(address.indexOf(' ') + 1, address.length)+"]";
 								            }
-											// instruction = instruction.replace("\n", "<br/>");
-											// console.log(instruction);
+											var lines = code.split('\n');
+											for(var i = 0;i < lines.length;i++){
+												if (step == i) codeLine = lines[i];
+											}
+											// console.log(codeLine);
 											var instructionSet = instruction.match(/[A-Z]+.*?,/g);
 											var argumentSet = instruction.match(/(,[^A-Z]*)/g);
 											var iterator = 0;
@@ -181,10 +187,9 @@ io.on("connection", function (socket) {
 													instructions.push(instructionSet[iterator] + argumentSet[iterator].substring(1, argumentSet[iterator].length) + "<br/>")
 												}
 											}
-											// console.log(instructions);
 											iterator = 0;
 											if (instructions != null) {
-												text = text + address + "<br/>";
+												text = text + codeLine + "<br/>" + address + "<br/>";
 												for (iterator; iterator < instructions.length; iterator++) {
 													text = text + instructions[iterator];
 												}
