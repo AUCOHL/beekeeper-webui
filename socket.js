@@ -6,7 +6,6 @@ var app = require('http').createServer(handler);
 var io = require('socket.io')(app);
 var fs = require('fs');
 var net = require('net');
-
 app.listen(9000);
 
 var prefix = `var data_cntr = `;
@@ -18,6 +17,7 @@ waveform.setOnChangeListener(function(e){
 });
 `;
 var out="";
+
 var workingDirectory="";
 var directory="";
 var userHome="";
@@ -71,6 +71,10 @@ function storeVCD() {
 
 io.on("connection", function (socket) {
 	socket.emit('proceed', { state: 'fine' });
+	process.on('uncaughtException', function (err) {
+	  	console.error(err);
+		//  	socket.emit('message', "encountered error");
+	});
 
 	socket.on('save', function (code) {
 		console.log(code);
@@ -84,6 +88,12 @@ io.on("connection", function (socket) {
 					console.log(err);
 					socket.emit('error', err);
 			    }
+			});
+			fs.writeFile("public/Scripts/code-text.js", "var code=`" + code + "`;", function(err) {
+				  if(err) {
+					  console.log(err);
+					  socket.emit('error', err);
+				  }
 			});
 		});
 	});
@@ -100,11 +110,17 @@ io.on("connection", function (socket) {
 					console.log(err);
 					socket.emit('error', err);
 			    } else {
+					fs.writeFile("public/Scripts/code-text.js", "var code=`" + code + "`;", function(err) {
+						  if(err) {
+							  console.log(err);
+							  socket.emit('message', err);
+						  }
+					});
 					console.log("The file was saved");
 					exec (`/usr/local/bin/BeekeeperSupport/cc ${filename}`, (error1, stdout1, stderr1) => {
 						if (error1 || stderr1) {
 							console.error(`cc failed: ${error1}.`);
-							socket.emit('error', error1);
+							socket.emit('message', error1);
 						}
 						// run samplesoc
 						exec (`cp -f /usr/local/bin/BeekeeperSupport/Compiler/examplesoc.json soc.json`, (error, stdout, stderr) => {
@@ -138,8 +154,42 @@ io.on("connection", function (socket) {
 											}
 											proc.kill();
 										} else {
-											processData = data;
-											fs.writeFile("public/Scripts/waveform-text.js", "var data=`" + data + "`;", function(err) {
+											var processData = "" + data;
+											// remove "(beekeeper)"
+											processData = processData.substring(0, processData.indexOf("(beekeeper)"));
+								            // Remove "Running step by step..."
+								            if (processData.indexOf("Running") > -1) {
+								                processData = processData.substring(processData.indexOf("Running") + "Running step by step...".length, processData.length-1);
+								            }
+											// get instruction
+											var instruction = processData.substring(0, processData.indexOf("["));
+											// get instruction address
+								            var address = processData.substring(processData.indexOf("["), processData.indexOf("]"));
+											// cleanup address
+								            if (address.indexOf("code.c") > -1) {
+								                address = "[" + address.substring(address.indexOf(' ') + 1, address.length)+"]";
+								            }
+											// instruction = instruction.replace("\n", "<br/>");
+											// console.log(instruction);
+											var instructionSet = instruction.match(/[A-Z]+.*?,/g);
+											var argumentSet = instruction.match(/(,[^A-Z]*)/g);
+											var iterator = 0;
+											var text = "";
+											var instructions = [];
+											if (instructionSet != null) {
+												for (iterator; iterator < instructionSet.length; iterator++) {
+													instructions.push(instructionSet[iterator] + argumentSet[iterator].substring(1, argumentSet[iterator].length) + "<br/>")
+												}
+											}
+											// console.log(instructions);
+											iterator = 0;
+											if (instructions != null) {
+												text = text + address + "<br/>";
+												for (iterator; iterator < instructions.length; iterator++) {
+													text = text + instructions[iterator];
+												}
+											}
+											fs.writeFile("public/Scripts/waveform-text.js", "var data=`" + text + "`;", function(err) {
 												  if(err) {
 													  console.log(err);
 													  socket.emit('error', err);
@@ -157,7 +207,6 @@ io.on("connection", function (socket) {
 			});
 		});
 	});
-
 	socket.on('run', function(code) {
 		if (proc !== 'undefined') {
 			proc.stdin.write('run\n');
@@ -216,16 +265,15 @@ function exitHandler(options, err) {
 		if (typeof(proc) !== 'undefined') {
 			proc.kill();
 		}
+		socket.emit('message', "Exit");
 		process.exit();
 	}
 }
 
-// //do something when app is closing
-// process.on('exit', exitHandler.bind(null,{exit:true}));
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{exit:true}));
 // //catches ctrl+c event
 // process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 // // catches "kill pid" (for example: nodemon restart)
 // process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
 // process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
-// //catches uncaught exceptions
-// process.on('uncaughtException', exitHandler.bind(null, {exit:true}));

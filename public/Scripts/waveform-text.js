@@ -1,6 +1,3 @@
-var data=`ADDI a5, zero, 4
-SW a5, -20(s0)
+var data=`[0x00000040]<br/>ADDI a5, zero, 0
 
-
-[code.c:4 0x00000024]
-(beekeeper) `;
+<br/>`;

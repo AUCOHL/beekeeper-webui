@@ -1,6 +1,7 @@
 var socket = io.connect('http://localhost:9000');
 run = false;
 var clicks = 0;
+var newWindow = window;
 var compiled = false;
 
 document.getElementById("run").disabled = true;
@@ -17,9 +18,7 @@ socket.on('proceed', function() {
 	};
 
 	document.getElementById("compile").onclick = function (code) {
-        document.getElementById("run").disabled = false;
-        document.getElementById("step").disabled = false;
-        document.getElementById("stepi").disabled = false;
+		document.getElementById("compile").disabled = true;
 		var code = editor.getValue();
 		clicks = 0;
 		compiled = true;
@@ -34,15 +33,6 @@ socket.on('proceed', function() {
 			alert("Please Compile First");
 		}
 	};
-
-	// document.getElementById('runff').onclick = function () {
-	// 	if (compiled) {
-	// 		socket.emit('runff');
-	// 		// setTimeout(function(){ window.open("waveform-viewer.html"); }, 1000);
-	// 	} else {
-	// 		alert("Please Compile First");
-	// 	}
-	// };
 
 	document.getElementById('step').onclick = function () {
 		if (compiled) {
@@ -60,24 +50,9 @@ socket.on('proceed', function() {
 		}
 	};
 
-	// document.getElementById('finish').onclick = function() {
-	// 	if (compiled) {
-	// 		socket.emit('finish');
-	// 	} else {
-	// 		alert("Please Compile First");
-	// 	}
-	// }
-
-	// document.getElementById('break').onclick = function() {
-	// 	if (compiled) {
-	// 		socket.emit('break');
-	// 	} else {
-	// 		alert("Please Compile First");
-	// 	}
-	// }
-
 	document.getElementById('waveform').onclick = function () {
-		window.open("waveform-viewer.html");
+		newWindow.close();
+		newWindow = window.open("waveform-viewer.html");
 	};
 });
 
@@ -90,7 +65,9 @@ function showSnack(text) {
 }
 
 socket.on('response', function() {
-	window.open("waveform-viewer.html");
+	newWindow.close();
+	document.getElementById("waveform").disabled = false;
+	newWindow = window.open("waveform-viewer.html");
 });
 
 socket.on('complete', function() {
@@ -105,6 +82,10 @@ socket.on('complete', function() {
 
 socket.on('finishedCompilation', function() {
 	showSnack("Compiled successfully");
+	document.getElementById("compile").disabled = false;
+	document.getElementById("run").disabled = false;
+	document.getElementById("step").disabled = false;
+	document.getElementById("stepi").disabled = false;
 });
 
 socket.on('error', function(data) {

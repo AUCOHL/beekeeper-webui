@@ -13,15 +13,7 @@
 			<img src='Images/logo-xxxs.png'/>
         </header>
         <main>
-            <script>
-            var allText = `int main()
-{
-    int a = 4;
-    int b = 3;
-    int c = a+c;
-    return 1;
-}`
-            </script>
+            <script src="Scripts/code-text.js"></script>
             <section>
 				<div id="toolbar" class="toolbar">
                     <button class="toolbar-button" id="save">Save</button>
@@ -42,7 +34,7 @@
 				    var editor = ace.edit("editor");
 				    editor.setTheme("ace/theme/monokai");
 				    editor.getSession().setMode("ace/mode/c_cpp");
-					editor.setValue(`${allText}`);
+					editor.setValue(`${code}`);
 				</script>
             </section>
         </main>

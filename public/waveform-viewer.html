@@ -22,20 +22,34 @@
         <p id="waveform-text"></p>
         <script type="text/javascript" src="Scripts/waveform-text.js"></script>
         <script type="text/javascript" >
-            var clean = "";
-            var instruction = "";
-            data = data.substr(0, data.indexOf("(beekeeper)"));
-            if (data.indexOf("Running") > -1) {
-                instruction = data.subster(data.indexOf("... ") + 4, data.indexOf("["));
-            } else {
-                instruction = data.substr(0, data.indexOf("["));
-            }
-            var clean = data.substr(0, data.indexOf("(beekeeper)"));
-            var address = data.substr(data.indexOf("["), data.indexOf("]"));
-            console.log(address);
-            console.log(instruction);
-            var text = address + "<br/>" + instruction;
-            document.getElementById('waveform-text').innerHTML = text;
+            // var lineString = "";
+            // var address = "";
+            // var splitData = "";
+            // var instruction = "";
+            // data = data.substr(0, data.indexOf("(beekeeper)"));
+            // // console.log(data);
+            // if (data.indexOf("Running") > -1) {
+            //     data = data.substr(data.indexOf("Running") + "Running step by step...".length, data.length-1);
+            // }
+            // instructions = data.substr(0, data.indexOf("["));
+            // splitData = data.match(/([A-Z]+|.*[A-Z]+)/);
+            // // splitData = splitData.replace("\1", "<br/>");
+            // console.log(splitData);
+            // if (data.indexOf("code.c") > -1) {
+            //     lineString = data.substr(data.indexOf("code.c") + "code.c:".length, data.indexOf(' ') - 2);
+            //     console.log(lineString);
+            // }
+            // address = data.substr(data.indexOf("["), data.indexOf("]"));
+            // if (data.indexOf("code.c") > -1) {
+            //     address = "[" + address.substr(address.indexOf(' ') + 1, address.length -1 );
+            // }
+            // // data = data.substr(0 + data.indexOf("["));
+            // // splitData = data.split('\n');
+            // // console.log(splitData);
+            // instructions = instructions.replace("\n", "<br/>");
+            // var text = address + "<br/>" + instructions;
+            // document.getElementById('waveform-text').innerHTML = text;
+            document.getElementById('waveform-text').innerHTML = data;
         </script>
     </footer>
 </body>
