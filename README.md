@@ -3,7 +3,7 @@ Install all listed items.
 ## node
     https://nodejs.org/en/download/package-manager/
 ## Verilog-VCD
-    You will need to make and install Verilog::VCD, there's no way around this it's required by vcd2js.
+You will need to make and install Verilog::VCD, there's no way around this it's required by vcd2js.
     https://metacpan.org/release/Verilog-VCD
 ## Program Dependencies
     sudo apt install iverilog dos2unix npm
@@ -11,7 +11,7 @@ Install all listed items.
     npm install -g socket.io node-getopt
 ## Beekeeper
 All dependencies required for Beekeeper must be met.
-A working Installation of Beekeeper must be installed in user home directory.
+A working Installation of Beekeeper must be installed in /usr/local/bin.
 Warning: When choosing Beekeeper installation directory don't place a trailing slash at the end of path.
 
 # Usage
@@ -25,8 +25,8 @@ Open Index.html in folder public, that's it, go ahead.
 Note: Single click is at work here. It's working in the background there's just no loading screen, will add.
 
 # Not working
-    Only running at the moment.
+    Nothing right now.
 # Future
-	Add loading spinner for buttons
-	Implement auto syntax detection for C and RISC so the user doesn't have to choose.
-    Multiple source files and tabs
+	Add loading spinner.
+	Implement auto syntax detection for C and RISC.
+    Multiple source files and tabs.
