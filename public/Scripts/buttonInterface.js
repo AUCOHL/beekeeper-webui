@@ -1,5 +1,5 @@
 var socket = io.connect('http://localhost:9000');
-run = false;
+var run = false;
 var clicks = 0;
 var newWindow = window;
 var compiled = false;
@@ -12,48 +12,38 @@ document.getElementById("waveform").disabled = true;
 socket.on('proceed', function() {
 
 	document.getElementById("save").onclick = function (code) {
-		showSnack("File saved");
 		var code = editor.getValue();
 		socket.emit('save', code);
+		showSnack("File saved");
 	};
 
 	document.getElementById("compile").onclick = function (code) {
 		document.getElementById("compile").disabled = true;
-		var code = editor.getValue();
-		clicks = 0;
+		run = false;
 		compiled = true;
+		var code = editor.getValue();
 		socket.emit('compile', code);
 	};
 
 	document.getElementById('run').onclick = function () {
-		if (compiled) {
-			run = true;
-			socket.emit('run');
-		} else {
-			alert("Please Compile First");
-		}
+		run = true;
+		socket.emit('run');
 	};
 
 	document.getElementById('step').onclick = function () {
-		if (compiled) {
-			socket.emit('step');
-		} else {
-			alert("Please Compile First");
-		}
+		socket.emit('step');
 	};
 
 	document.getElementById('stepi').onclick = function () {
-		if (compiled) {
-			socket.emit('stepi');
-		} else {
-			alert("Please Compile First");
-		}
+		socket.emit('stepi');
 	};
 
 	document.getElementById('waveform').onclick = function () {
 		newWindow.close();
-		newWindow = window.open("waveform-viewer.html");
+		if (run) newWindow = window.open("waveform-viewer/waveform-viewer.html");
+		else newWindow = window.open("waveform-viewer/waveform-console.html");
 	};
+
 });
 
 function showSnack(text) {
@@ -67,17 +57,18 @@ function showSnack(text) {
 socket.on('response', function() {
 	newWindow.close();
 	document.getElementById("waveform").disabled = false;
-	newWindow = window.open("waveform-viewer.html");
+	if (run) newWindow = window.open("waveform-viewer/waveform-viewer.html");
+	else newWindow = window.open("waveform-viewer/waveform-console.html");
 });
 
 socket.on('complete', function() {
     console.log("received complete signal");
+    showSnack("Program finished");
     document.getElementById("run").disabled = true;
     document.getElementById("step").disabled = true;
     document.getElementById("stepi").disabled = true;
     document.getElementById("waveform").disabled = false;
-	if (run) document.getElementById("waveform").click();
-    showSnack("Program finished");
+	document.getElementById("waveform").click();
 });
 
 socket.on('finishedCompilation', function() {
@@ -89,9 +80,11 @@ socket.on('finishedCompilation', function() {
 });
 
 socket.on('error', function(data) {
-	alert(`${data}`);
+	showSnack(`${data}`);
+	document.getElementById("compile").disabled = false;
 });
 
 socket.on('message', function(data) {
-	showSnack(`${data}`);
+	showSnack(data);
+	document.getElementById("compile").disabled = false;
 });

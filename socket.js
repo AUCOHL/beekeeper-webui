@@ -18,16 +18,9 @@ waveform.setOnChangeListener(function(e){
 `;
 var out="";
 
-var workingDirectory="";
 var step = 0;
 var codeLine = "";
-var directory="";
-var userHome="";
-var home="";
-var uname="";
-var name="";
 var filename = "code.c";
-var firstStep = true;
 var processData = "";
 var processError = "";
 var stepping = false;
@@ -47,224 +40,6 @@ function handler (req, res) {
 	});
 }
 
-function storeVCD() {
-	exec (`./vcd2js.pl dump.vcd`, (error3, stdout3, stderr3) => {
-		if (error3 || stderr3) {
-			console.error(`vcd2js failed: ${error3}.`);
-			socket.emit('error', error3);
-		}
-		var out =  prefix+stdout3+suffix;
-		fs.writeFile("waveform-data.js",out, function(err) {
-			if(err) {
-				return console.log(err);
-			}
-			exec(`cp -f waveform-data.js public/Scripts`,
-				(error4, stdout4, stderr4) => {
-					if (error4 || stderr4) {
-						console.error(`waveform-source store failed: ${error4}.`);
-						socket.emit('error', error4);
-					}
-                    console.log("VCD stored");
-			});
-		});
-		return stdout3;
-	});
-}
-
-io.on("connection", function (socket) {
-	socket.emit('proceed', { state: 'fine' });
-	process.on('uncaughtException', function (err) {
-	  	console.error(err);
-		//  	socket.emit('message', "encountered error");
-	});
-
-	socket.on('save', function (code) {
-		console.log(code);
-		exec(`rm -f code.c`, (error, stdout, stderr) => {
-			if (error || stderr) {
-				console.error(`cd failed: ${error}.`);
-				socket.emit('error', error);
-			}
-			fs.writeFile("code.c", code, function(err) {
-			    if(err) {
-					console.log(err);
-					socket.emit('error', err);
-			    }
-			});
-			fs.writeFile("public/Scripts/code-text.js", "var code=`" + code + "`;", function(err) {
-				  if(err) {
-					  console.log(err);
-					  socket.emit('error', err);
-				  }
-			});
-		});
-	});
-
-	socket.on('compile', function (code) {
-		console.log(code);
-		exec(`rm -f code.c`, (error, stdout, stderr) => {
-			if (error || stderr) {
-				console.error(`cd failed: ${error}.`);
-				socket.emit('error', error);
-			}
-			fs.writeFile(filename, code, function(err) {
-			    if(err) {
-					console.log(err);
-					socket.emit('error', err);
-			    } else {
-					fs.writeFile("public/Scripts/code-text.js", "var code=`" + code + "`;", function(err) {
-						  if(err) {
-							  console.log(err);
-							  socket.emit('message', err);
-						  }
-					});
-					console.log("The file was saved");
-					exec (`/usr/local/bin/BeekeeperSupport/cc ${filename}`, (error1, stdout1, stderr1) => {
-						if (error1 || stderr1) {
-							console.error(`cc failed: ${error1}.`);
-							socket.emit('message', error1);
-						}
-						// run samplesoc
-						exec (`cp -f /usr/local/bin/BeekeeperSupport/Compiler/examplesoc.json soc.json`, (error, stdout, stderr) => {
-							if (error || stderr) {
-								console.error(`Couldn't copy samplesoc: ${error}.`);
-								socket.emit('error', error);
-							}
-							// run makesoc
-							exec (`/usr/local/bin/BeekeeperSupport/makesoc soc.json`, (error, stdout, stderr) => {
-								if (error || stderr) {
-									console.error(`Couldn't makesoc: ${error}.`);
-									socket.emit('error', error);
-								}
-								// build
-								exec (`iverilog -o code.c.bin_dump/Beekeeper.vvp -I/usr/local/bin/BeekeeperSupport/ BFM.v`, (error3, stdout3, stderr3) => {
-									if (error3 || stderr3) {
-										console.error(`iverilog failed: ${error3}.`);
-										socket.emit('error', error3);
-									}
-									console.log("finished compilation");
-									// vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
-									global.proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
-		                           	proc.stdin.setEncoding('utf-8');
-									// proc.stdout.pipe(process.stdout);
-									proc.stdout.on('data', (data) => {
-										global.data = data;
-										if (data.indexOf("JAL zero, 0") > -1) {
-											if (true) {
-												storeVCD();
-												socket.emit("complete");
-											}
-											proc.kill();
-										} else {
-											var processData = "" + data;
-											// remove "(beekeeper)"
-											processData = processData.substring(0, processData.indexOf("(beekeeper)"));
-								            // Remove "Running step by step..."
-								            if (processData.indexOf("Running") > -1) {
-								                processData = processData.substring(processData.indexOf("Running") + "Running step by step...".length, processData.length-1);
-								            }
-											// get instruction
-											var instruction = processData.substring(0, processData.indexOf("["));
-											// get instruction address
-								            var address = processData.substring(processData.indexOf("["), processData.indexOf("]"));
-											// cleanup address
-								            if (address.indexOf("code.c") > -1) {
-												step = parseInt(address.substring(address.indexOf('code.c:') + "code.c:".length, address.indexOf(' ')));
-											    address = "[" + address.substring(address.indexOf(' ') + 1, address.length)+"]";
-								            }
-											var lines = code.split('\n');
-											for(var i = 0;i < lines.length;i++){
-												if (step == i) codeLine = lines[i];
-											}
-											// console.log(codeLine);
-											var instructionSet = instruction.match(/[A-Z]+.*?,/g);
-											var argumentSet = instruction.match(/(,[^A-Z]*)/g);
-											var iterator = 0;
-											var text = "";
-											var instructions = [];
-											if (instructionSet != null) {
-												for (iterator; iterator < instructionSet.length; iterator++) {
-													instructions.push(instructionSet[iterator] + argumentSet[iterator].substring(1, argumentSet[iterator].length) + "<br/>")
-												}
-											}
-											iterator = 0;
-											if (instructions != null) {
-												text = text + codeLine + "<br/>" + address + "<br/>";
-												for (iterator; iterator < instructions.length; iterator++) {
-													text = text + instructions[iterator];
-												}
-											}
-											fs.writeFile("public/Scripts/waveform-text.js", "var data=`" + text + "`;", function(err) {
-												  if(err) {
-													  console.log(err);
-													  socket.emit('error', err);
-												  }
-											});
-										}
-									});
-									socket.emit('finishedCompilation');
-									setTimeout(function(){ proc.stdin.write('code.c.bin\n'); }, 500);
-								});
-							});
-						});
-					});
-				}
-			});
-		});
-	});
-	socket.on('run', function(code) {
-		if (proc !== 'undefined') {
-			proc.stdin.write('run\n');
-        } else {
-            socket.emit('message', "Compile first");
-        }
-	});
-
-	socket.on('runff', function(code) {
-		if (proc !== 'undefined') {
-            proc.stdin.write('runff\n');
-			setTimeout(function(){ storeVCD(); socket.emit('response'); socket.emit("complete");}, 5000);
-        } else {
-            socket.emit('message', "Compile first");
-        }
-	});
-
-	socket.on('step', function(code) {
-		if (proc !=='undefined') {
-			stepping = true;
-			proc.stdin.write('step\n');
-			console.log('step');
-			storeVCD();
-			socket.emit('response');
-		} else {
-            socket.emit('message', "Compile first");
-        }
-	});
-
-	socket.on('stepi', function(code) {
-		if (proc !== 'undefined') {
-			stepping = true;
-			proc.stdin.write('stepi\n');
-			console.log('stepi');
-			storeVCD();
-			socket.emit('response');
-		} else {
-            socket.emit('message', "Compile first");
-        }
-	});
-
-	socket.on('finish', function(code) {
-		if (proc !== 'undefined')
-		proc.stdin.write('exit\r');
-		proc.stdin.end();
-	});
-
-	socket.on('break', function(code) {
-		if (proc !== 'undefined')
-		proc.stdin.write('break\n');
-	});
-});
-
 function exitHandler(options, err) {
     if (options.exit) {
 		if (typeof(proc) !== 'undefined') {
@@ -274,6 +49,170 @@ function exitHandler(options, err) {
 		process.exit();
 	}
 }
+
+function storeVCD() {
+	exec (`./vcd2js.pl dump.vcd`, (error3, stdout3, stderr3) => {
+		if (error3 || stderr3) {
+			// socket.emit('error', error3);
+		}
+		var out =  prefix+stdout3+suffix;
+		storeFile("public/Scripts/waveform-data.js", out);
+		return stdout3;
+	});
+}
+
+function storeFile(file, text) {
+	fs.writeFile(file, text, function(err) {
+		if(err) {
+			console.log(err);
+			socket.emit('error', err);
+		}
+	});
+}
+
+io.on("connection", function (socket) {
+	socket.emit('proceed', { state: 'fine' });
+
+	process.on('uncaughtException', function (err) {
+	  	console.error(err);
+	});
+
+	socket.on('save', function (code) {
+		storeFile(filename, code);
+		storeFile("public/Scripts/code-text.js", "var code=`" + code + "`;");
+	});
+
+	socket.on('compile', function (code) {
+		storeFile(filename, code);
+		storeFile("public/Scripts/code-text.js", "var code=`" + code + "`;");
+		exec (`/usr/local/bin/BeekeeperSupport/cc ${filename}`, (error1, stdout1, stderr1) => {
+			if (error1 || stderr1) {
+				console.error(`cc failed: ${error1}.`);
+				socket.emit('message', "Compilation Failed");
+			}
+			// run samplesoc
+			else exec (`cp -f /usr/local/bin/BeekeeperSupport/Compiler/examplesoc.json soc.json`, (error, stdout, stderr) => {
+				if (error || stderr) {
+					console.error(`Couldn't copy samplesoc: ${error}.`);
+					socket.emit('error', error);
+				}
+				// run makesoc
+				else exec (`/usr/local/bin/BeekeeperSupport/makesoc soc.json`, (error, stdout, stderr) => {
+					if (error || stderr) {
+						console.error(`Couldn't makesoc: ${error}.`);
+						socket.emit('error', {error});
+					}
+					// build
+					else exec (`iverilog -o code.c.bin_dump/Beekeeper.vvp -I/usr/local/bin/BeekeeperSupport/ BFM.v`, (error3, stdout3, stderr3) => {
+						if (error3 || stderr3) {
+							console.error(`iverilog failed: ${error3}.`);
+							socket.emit('error', error3);
+						}
+						// vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
+						global.proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
+                       	proc.stdin.setEncoding('utf-8');
+						// proc.stdout.pipe(process.stdout);
+						proc.stdout.on('data', (data) => {
+							global.data = data;
+							if (data.indexOf("JAL zero, 0") > -1) {
+								storeVCD();
+								socket.emit("complete");
+								proc.kill();
+							} else {
+								var processData = "" + data;
+								// remove "(beekeeper)"
+								processData = processData.substring(0, processData.indexOf("(beekeeper)"));
+					            // Remove "Running step by step..."
+					            if (processData.indexOf("Running") > -1) {
+					                processData = processData.substring(processData.indexOf("Running") + "Running step by step...".length, processData.length-1);
+					            }
+								// get instructions
+								var instruction = processData.substring(0, processData.indexOf("["));
+								// get instruction address
+					            var address = processData.substring(processData.indexOf("["), processData.indexOf("]"));
+								// cleanup address
+					            if (address.indexOf("code.c") > -1) {
+									// get instruction line number
+									step = parseInt(address.substring(address.indexOf('code.c:') + "code.c:".length, address.indexOf(' ')));
+									// get instruction address
+								    address = "[" + address.substring(address.indexOf(' ') + 1, address.length) + "]";
+					            }
+								var lines = code.split('\n');
+								// TODO improve the loop
+								// get the code line. This loop is inefficient
+								for(var i = 0;i < lines.length;i++){
+									if (step == i) codeLine = lines[i];
+								};
+								// grab the instruction op
+								var instructionSet = instruction.match(/[A-Z]+.*?,/g);
+								// grab the instruction arguments
+								var argumentSet = instruction.match(/(,[^A-Z]*)/g);
+								var instructions = [];
+								if (instructionSet != null) {
+									for (var iterator = 0; iterator < instructionSet.length; iterator++) {
+										instructions.push(instructionSet[iterator] + argumentSet[iterator].substring(1, argumentSet[iterator].length) + "<br/>")
+									}
+								}
+								// create console text
+								var text = "";
+								if (instructions != null) {
+									// line of code first, followed by address
+									text = text + codeLine + "<br/>" + address + "<br/>";
+									// append instructions to text
+									for (var iterator = 0; iterator < instructions.length; iterator++) {
+										text = text + instructions[iterator];
+									}
+								}
+								storeFile("public/Scripts/waveform-text.js", "var data=`" + text + "`;");
+							}
+						});
+						socket.emit('finishedCompilation');
+						// set beekeeper program path
+						setTimeout(function(){ proc.stdin.write('code.c.bin\n'); }, 500);
+					});
+				});
+			});
+		});
+	});
+
+	socket.on('run', function(code) {
+		proc.stdin.write('run\n');
+	});
+
+	socket.on('runff', function(code) {
+	    proc.stdin.write('runff\n');
+		setTimeout(function() {
+			storeVCD();
+			socket.emit('complete');
+			socket.emit('response');
+		}, 5000);
+	});
+
+	socket.on('step', function(code) {
+		stepping = true;
+		proc.stdin.write('step\n');
+		storeVCD();
+		socket.emit('response');
+	});
+
+	socket.on('stepi', function(code) {
+		stepping = true;
+		proc.stdin.write('stepi\n');
+		storeVCD();
+		socket.emit('response');
+	});
+
+	socket.on('finish', function(code) {
+		if (proc !== 'undefined')
+		proc.stdin.write('exit\n');
+		proc.stdin.end();
+	});
+
+	socket.on('break', function(code) {
+		if (proc !== 'undefined')
+		proc.stdin.write('break\n');
+	});
+});
 
 //do something when app is closing
 process.on('exit', exitHandler.bind(null,{exit:true}));

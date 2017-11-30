@@ -1,3 +1,18 @@
+/* Header */
+header {
+    background-color: #2C2E31;
+    position: relative;
+    height: 40px;
+    z-index: 100;
+    box-shadow: 0 0 24px rgba(0,0,0,0.4);
+}
+
+header img {
+    height: 30px;
+	padding: 5px;
+    transition: transform 0.3s ease-in-out;
+}
+
 body {
     margin: 0;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -12,6 +27,19 @@ main {
     bottom: 0;
 }
 
+/* Toolbar */
+#toolbar {
+	background-color: #2C2E31;
+    height: 35px;
+}
+
+.toolbar-button {
+    margin-top: 5px;
+    height: 25px;
+    color: white;
+    text-align: center;
+}
+
 /* Editor */
 section {
     position: absolute;
@@ -21,11 +49,6 @@ section {
     width: 100%;
     box-sizing: border-box;
     overflow: visible;
-}
-
-#toolbar {
-	background-color: #2C2E31;
-    height: 35px;
 }
 
 section > #editor {
@@ -60,87 +83,6 @@ body.loading {
    modal element will be visible */
 body.loading .modal {
     display: block;
-}
-
-/* Header */
-header {
-    position: relative;
-    height: 40px;
-    z-index: 100;
-    box-shadow: 0 0 24px rgba(0,0,0,0.4);
-}
-
-header img {
-    height: 30px;
-	padding: 5px;
-    transition: transform 0.3s ease-in-out;
-}
-
-header > div {
-    position: relative;
-    display: inline-block;
-    word-wrap: nowrap;
-    overflow: visible;
-    box-sizing: border-box;
-    height: 100%;
-    margin: 0;
-    vertical-align: top;
-}
-
-/*header > div > span {
-    padding: 0.75em 2em;
-    margin: 0;
-    height: 100%;
-    display: inline-block;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 3;
-    top: 0;
-    transition: background-color 0.5s ease, color 0.5s ease;
-    cursor: pointer;
-    vertical-align: middle;
-}*/
-
-header > div > div {
-    display: none;
-    width: 200%;
-    border-radius: 0 0 4px 4px;
-    overflow: hidden;
-    z-index: 100;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    box-sizing: border-box;
-    box-shadow: 0 0 8px black;
-}
-
-header > div:hover > div {
-    display: block;
-}
-
-header > div > div > input {
-    display: none;
-}
-
-header > div > div > a, header > div > div > label {
-    display: block;
-    background: transparent;
-    padding: 1em;
-    font-size: 75%;
-    transition: background-color 0.5s ease, color 0.5s ease, 0.5s ease padding-left;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-header > div > div > a:hover, header > div > div > label:hover {
-    padding-left: 2em;
-}
-
-.toolbar-button {
-    margin-top: 5px;
-    height: 25px;
-    color: white;
-    text-align: center;
 }
 
 #snackbar {
