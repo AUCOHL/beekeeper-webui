@@ -49,15 +49,16 @@ function exitHandler(options, err) {
 		process.exit();
 	}
 }
+// global.proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
+// proc.stdin.setEncoding('utf-8');
+// // proc.stdout.pipe(process.stdout);
+// proc.stdout.on('data', (data) => {
 
 function storeVCD() {
-	exec (`./vcd2js.pl dump.vcd`, (error3, stdout3, stderr3) => {
-		if (error3 || stderr3) {
-			// socket.emit('error', error3);
-		}
-		var out =  prefix+stdout3+suffix;
+	var child = spawn('./vcd2js.pl', ['dump.vcd']);
+	child.stdout.on('data', (data) => {
+		var out =  prefix+data+suffix;
 		storeFile("public/Scripts/waveform-data.js", out);
-		return stdout3;
 	});
 }
 
