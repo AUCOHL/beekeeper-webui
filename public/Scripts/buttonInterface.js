@@ -41,9 +41,8 @@ socket.on('proceed', function() {
 	document.getElementById('waveform').onclick = function () {
 		newWindow.close();
 		if (run) newWindow = window.open("waveform-viewer/waveform-viewer.html");
-		else newWindow = window.open("waveform-viewer/waveform-console.html");
+		else newWindow = window.open("waveform-viewer/waveform-footer.html");
 	};
-
 });
 
 function showSnack(text) {
@@ -58,7 +57,7 @@ socket.on('response', function() {
 	newWindow.close();
 	document.getElementById("waveform").disabled = false;
 	if (run) newWindow = window.open("waveform-viewer/waveform-viewer.html");
-	else newWindow = window.open("waveform-viewer/waveform-console.html");
+	else newWindow = window.open("waveform-viewer/waveform-footer.html");
 });
 
 socket.on('complete', function() {

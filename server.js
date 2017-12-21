@@ -17,7 +17,6 @@ waveform.setOnChangeListener(function(e){
 });
 `;
 var out="";
-
 var step = 0;
 var codeLine = "";
 var filename = "code.c";
@@ -49,17 +48,17 @@ function exitHandler(options, err) {
 		process.exit();
 	}
 }
-// global.proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
-// proc.stdin.setEncoding('utf-8');
-// // proc.stdout.pipe(process.stdout);
-// proc.stdout.on('data', (data) => {
 
 function storeVCD() {
 	var child = spawn('./vcd2js.pl', ['dump.vcd']);
+	var output = "";
 	child.stdout.on('data', (data) => {
-		var out =  prefix+data+suffix;
-		storeFile("public/Scripts/waveform-data.js", out);
+		output += data;
 	});
+	child.stdout.on('close', function(code) {
+        var out =  prefix + output + suffix;
+		storeFile("public/data/waveform-data.js", out);
+    });
 }
 
 function storeFile(file, text) {
@@ -80,12 +79,13 @@ io.on("connection", function (socket) {
 
 	socket.on('save', function (code) {
 		storeFile(filename, code);
-		storeFile("public/Scripts/code-text.js", "var code=`" + code + "`;");
+		storeFile("public/data/code-text.js", "var code=`" + code + "`;");
 	});
 
 	socket.on('compile', function (code) {
 		storeFile(filename, code);
-		storeFile("public/Scripts/code-text.js", "var code=`" + code + "`;");
+		storeFile("public/data/code-text.js", "var code=`" + code + "`;");
+		// TODO figure out a way to simplify this callback hell
 		exec (`/usr/local/bin/BeekeeperSupport/cc ${filename}`, (error1, stdout1, stderr1) => {
 			if (error1 || stderr1) {
 				console.error(`cc failed: ${error1}.`);
@@ -139,8 +139,7 @@ io.on("connection", function (socket) {
 								    address = "[" + address.substring(address.indexOf(' ') + 1, address.length) + "]";
 					            }
 								var lines = code.split('\n');
-								// TODO improve the loop
-								// get the code line. This loop is inefficient
+								// get the code line TODO improve the loop
 								for(var i = 0;i < lines.length;i++){
 									if (step == i) codeLine = lines[i];
 								};
@@ -164,7 +163,7 @@ io.on("connection", function (socket) {
 										text = text + instructions[iterator];
 									}
 								}
-								storeFile("public/Scripts/waveform-text.js", "var data=`" + text + "`;");
+								storeFile("public/data/waveform-text.js", "var data=`" + text + "`;");
 							}
 						});
 						socket.emit('finishedCompilation');
