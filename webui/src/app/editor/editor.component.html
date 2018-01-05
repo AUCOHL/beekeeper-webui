@@ -1,0 +1,40 @@
+<!doctype HTML>
+<html>
+    <body >
+        <!-- Jquery for Ace -->
+        <script type="text/javascript" charset="utf-8" src="../../../scripts/jquery.js"></script>
+        <!-- Top bar with the logo -->
+        <header>
+			<img alt="CloudV Logo" src='../../../images/logo-xxxs.png'/>
+        </header>
+        <main>
+            <!-- Contains the ${code} -->
+            <script src="../../../scripts/code-text.js"></script>
+            <section>
+                <!-- Toolbar with the buttons -->
+                <div id="toolbar" class="toolbar">
+					<button class="toolbar-button" id="compile">Compile</button>
+                    <button class="toolbar-button" id="save">Save</button>
+					<button class="toolbar-button" id="run">Run</button>
+                    <button class="toolbar-button" id="step">Step</button>
+                    <button class="toolbar-button" id="stepi">Step Instruction</button>
+                    <button class="toolbar-button" id="waveform">Waveform</button>
+                    <!-- snackbar for messages -->
+                    <div id="snackbar"></div>
+				</div>
+                <!-- Ace editor -->
+				<div id="editor"></div>
+                <script type="text/javascript" src="../../../bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+                <script type="text/javascript" src="../../../bower_components/angular/angular.js"></script>
+                <script type="text/javascript" src="../../../bower_components/angular-ui-ace/ui-ace.js"></script>
+                <!-- Load editor theme, mode, and source code -->
+                <script>
+				    var editor = ace.edit("editor");
+				    editor.setTheme("../../../bower_components/ace-builds/src-noconflict/ace/theme-monokai");
+				    editor.getSession().setMode("../../../bower_components/ace-builds/src-noconflict/ace/mode-c_cpp");
+					editor.setValue(`${code}`);
+				</script>
+            </section>
+        </main>
+    </body>
+</html>
