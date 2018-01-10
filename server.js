@@ -8,6 +8,8 @@ var fs = require('fs');
 var net = require('net');
 app.listen(9000);
 
+// Prefix and suffix are needed for proper display of the waveform.
+//  DO NOT CHANGE THEM.
 var prefix = `var data_cntr = `;
 var suffix = `;
 var timing = JSON.parse('{"rendered":["mod_7SEG_tb.clk","mod_7SEG_tb.segA","mod_7SEG_tb.segB","mod_7SEG_tb.segC","mod_7SEG_tb.segD","mod_7SEG_tb.segDP","mod_7SEG_tb.rst","mod_7SEG_tb.segE","mod_7SEG_tb.segF","mod_7SEG_tb.DUT.BCD[3:0]"],"hidden":["mod_7SEG_tb.DUT.SevenSeg[7:0]","mod_7SEG_tb.DUT.cntovf","mod_7SEG_tb.DUT.rst","mod_7SEG_tb.DUT.cnt[1:0]","mod_7SEG_tb.DUT.clk","mod_7SEG_tb.segG"],"from":43,"to":69,"cursor":"52.75","cursorExact":52.753017641597026,"end":150,"originalEnd":"150","radix":2,"timeScale":"1","timeScaleUnit":"ns","timeUnit":1000,"highlightedIndex":5}');
@@ -17,16 +19,29 @@ waveform.setOnChangeListener(function(e){
 });
 `;
 var out="";
-var step = 0;
-var codeLine = "";
-var filename = "code.c";
-var processData = "";
-var processError = "";
+// Whether or not we're in stepping mode
 var stepping = false;
+// Count number of steps
+var step = 0;
+// Save the current line of code
+var codeLine = "";
+// Save current child process data
+var processData = "";
+// Receive current child process error
+var processError = "";
+
+var userData = {
+	codeFileName: "code.c",
+	codeCFile: `public/data/code.c`,
+	codeTextFile: "./public/data/code-text.js",
+	waveformDataFile: "./public/data/waveform-data.js",
+	waveformTextFile: "./public/data/waveform-text.js"
+}
 
 //so the program will not close instantly
 process.stdin.resume();
 
+// HTTP server handler
 function handler (req, res) {
 	fs.readFile(__dirname + '/public/index.html',
 		function (err, data) {
@@ -39,6 +54,7 @@ function handler (req, res) {
 	});
 }
 
+// Handle the process exit
 function exitHandler(options, err) {
     if (options.exit) {
 		if (typeof(proc) !== 'undefined') {
@@ -49,18 +65,22 @@ function exitHandler(options, err) {
 	}
 }
 
+// Store the vcd2waveform data in the user data folder
 function storeVCD() {
 	var child = spawn('./vcd2js.pl', ['dump.vcd']);
 	var output = "";
 	child.stdout.on('data', (data) => {
 		output += data;
 	});
+	// Only save when process is finished
 	child.stdout.on('close', function(code) {
         var out =  prefix + output + suffix;
+		// console.log(out);
 		storeFile("public/data/waveform-data.js", out);
     });
 }
 
+// Helper function to store files on drive
 function storeFile(file, text) {
 	fs.writeFile(file, text, function(err) {
 		if(err) {
@@ -70,23 +90,31 @@ function storeFile(file, text) {
 	});
 }
 
+// Where all socket communication takes place
 io.on("connection", function (socket) {
+	// Once socket is initialized inform other party to proceed
 	socket.emit('proceed', { state: 'fine' });
 
+	// Catch all exceptions to make sure server doesn't crash
+	// TODO exception handling needs to be done properly
 	process.on('uncaughtException', function (err) {
 	  	console.error(err);
 	});
 
+	// Save user code taken from Ace instance
+	function saveCode (code) {
+		storeFile(userData.codeCFile, code);
+		storeFile(userData.codeTextFile, "var code=`" + code + "`;");
+	}
 	socket.on('save', function (code) {
-		storeFile(filename, code);
-		storeFile("public/data/code-text.js", "var code=`" + code + "`;");
+		saveCode(code);
 	});
 
 	socket.on('compile', function (code) {
-		storeFile(filename, code);
-		storeFile("public/data/code-text.js", "var code=`" + code + "`;");
+		saveCode(code);
+		console.log(userData.codeCFile + "\n" + userData.codeFileName);
 		// TODO figure out a way to simplify this callback hell
-		exec (`/usr/local/bin/BeekeeperSupport/cc ${filename}`, (error1, stdout1, stderr1) => {
+		exec (`/usr/local/bin/BeekeeperSupport/cc ${userData.codeCFile}`, (error1, stdout1, stderr1) => {
 			if (error1 || stderr1) {
 				console.error(`cc failed: ${error1}.`);
 				socket.emit('message', "Compilation Failed");
@@ -104,13 +132,13 @@ io.on("connection", function (socket) {
 						socket.emit('error', {error});
 					}
 					// build
-					else exec (`iverilog -o code.c.bin_dump/Beekeeper.vvp -I/usr/local/bin/BeekeeperSupport/ BFM.v`, (error3, stdout3, stderr3) => {
+					else exec (`iverilog -o ${userData.codeCFile}.bin_dump/Beekeeper.vvp -I/usr/local/bin/BeekeeperSupport/ BFM.v`, (error3, stdout3, stderr3) => {
 						if (error3 || stderr3) {
 							console.error(`iverilog failed: ${error3}.`);
 							socket.emit('error', error3);
 						}
 						// vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
-						global.proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', 'code.c.bin_dump/Beekeeper.vvp']);
+						global.proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', `${userData.codeCFile}.bin_dump/Beekeeper.vvp`]);
                        	proc.stdin.setEncoding('utf-8');
 						// proc.stdout.pipe(process.stdout);
 						proc.stdout.on('data', (data) => {
@@ -132,9 +160,9 @@ io.on("connection", function (socket) {
 								// get instruction address
 					            var address = processData.substring(processData.indexOf("["), processData.indexOf("]"));
 								// cleanup address
-					            if (address.indexOf("code.c") > -1) {
+					            if (address.indexOf(userData.codeFileName) > -1) {
 									// get instruction line number
-									step = parseInt(address.substring(address.indexOf('code.c:') + "code.c:".length, address.indexOf(' ')));
+									step = parseInt(address.substring(address.indexOf(`${userData.codeFileName}:`) + `${userData.codeFileName}:`.length, address.indexOf(' ')));
 									// get instruction address
 								    address = "[" + address.substring(address.indexOf(' ') + 1, address.length) + "]";
 					            }
@@ -163,7 +191,7 @@ io.on("connection", function (socket) {
 										text = text + instructions[iterator];
 									}
 								}
-								storeFile("public/data/waveform-text.js", "var data=`" + text + "`;");
+								storeFile(userData.waveformTextFile, "var data=`" + text + "`;");
 							}
 						});
 						socket.emit('finishedCompilation');
@@ -214,7 +242,7 @@ io.on("connection", function (socket) {
 	});
 });
 
-//do something when app is closing
+// Bind the process exit event to our exit handler
 process.on('exit', exitHandler.bind(null,{exit:true}));
 // //catches ctrl+c event
 // process.on('SIGINT', exitHandler.bind(null, {exit:true}));
