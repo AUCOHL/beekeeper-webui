@@ -29,10 +29,12 @@ var codeLine = "";
 var processData = "";
 // Receive current child process error
 var processError = "";
+// Track the beekeeper process
+var proc;
 
 var userData = {
 	codeFileName: "code.c",
-	codeCFile: `public/data/code.c`,
+	codeCFile: "code.c",
 	codeTextFile: "./public/data/code-text.js",
 	waveformDataFile: "./public/data/waveform-data.js",
 	waveformTextFile: "./public/data/waveform-text.js"
@@ -112,7 +114,6 @@ io.on("connection", function (socket) {
 
 	socket.on('compile', function (code) {
 		saveCode(code);
-		console.log(userData.codeCFile + "\n" + userData.codeFileName);
 		// TODO figure out a way to simplify this callback hell
 		exec (`/usr/local/bin/BeekeeperSupport/cc ${userData.codeCFile}`, (error1, stdout1, stderr1) => {
 			if (error1 || stderr1) {
@@ -137,8 +138,10 @@ io.on("connection", function (socket) {
 							console.error(`iverilog failed: ${error3}.`);
 							socket.emit('error', error3);
 						}
+						// If a pervious process is alive, exit
+						if (proc !== undefined) proc.stdin.write('exit\n');
 						// vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
-						global.proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', `${userData.codeCFile}.bin_dump/Beekeeper.vvp`]);
+						proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', `${userData.codeCFile}.bin_dump/Beekeeper.vvp`]);
                        	proc.stdin.setEncoding('utf-8');
 						// proc.stdout.pipe(process.stdout);
 						proc.stdout.on('data', (data) => {
@@ -204,16 +207,13 @@ io.on("connection", function (socket) {
 	});
 
 	socket.on('run', function(code) {
-		proc.stdin.write('run\n');
+		if (stepping) proc.stdin.write('continue\n');
+		else proc.stdin.write('run\n');
 	});
 
 	socket.on('runff', function(code) {
-	    proc.stdin.write('runff\n');
-		setTimeout(function() {
-			storeVCD();
-			socket.emit('complete');
-			socket.emit('response');
-		}, 5000);
+		if (stepping) proc.stdin.write('continue\n');
+		else proc.stdin.write('runff\n');
 	});
 
 	socket.on('step', function(code) {
