@@ -1,5 +1,5 @@
-./code.c
-./code.c.*
+code.c
+code.c*
 code.c.bin_dump
 webui
 dump.vcd
