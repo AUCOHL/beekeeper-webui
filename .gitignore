@@ -3,6 +3,6 @@ code.c*
 code.c.bin_dump
 webui
 dump.vcd
-package-lock.json
 soc.json
 public/data/*
+!public/data/code-txt.js
