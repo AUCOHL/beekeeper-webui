@@ -31,13 +31,17 @@ var processData = "";
 var processError = "";
 // Track the beekeeper process
 var proc;
+// Flag to keep track of beekeeper termination
+var finished = false;
 
 var userData = {
 	codeFileName: "code.c",
 	codeCFile: "code.c",
 	codeTextFile: "./public/data/code-text.js",
+	codeBinFile: "code.c.bin",
 	waveformDataFile: "./public/data/waveform-data.js",
-	waveformTextFile: "./public/data/waveform-text.js"
+	waveformTextFile: "./public/data/waveform-text.js",
+	disassemblyTextFile: "public/data/disassembly.js"
 }
 
 //so the program will not close instantly
@@ -140,16 +144,19 @@ io.on("connection", function (socket) {
 						}
 						// If a pervious process is alive, exit
 						if (proc !== undefined) proc.stdin.write('exit\n');
-						// vvp -M/home/ahmed/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
+						// vvp -M/usr/local/bin/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
 						proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', `${userData.codeCFile}.bin_dump/Beekeeper.vvp`]);
                        	proc.stdin.setEncoding('utf-8');
+						// set beekeeper program path
+						proc.stdin.write('code.c.bin\n');
+						// NOTE uncomment for debugging
 						// proc.stdout.pipe(process.stdout);
 						proc.stdout.on('data', (data) => {
 							global.data = data;
 							if (data.indexOf("JAL zero, 0") > -1) {
+								proc.stdin.write('exit');
 								storeVCD();
 								socket.emit("complete");
-								proc.kill();
 							} else {
 								var processData = "" + data;
 								// remove "(beekeeper)"
@@ -198,8 +205,6 @@ io.on("connection", function (socket) {
 							}
 						});
 						socket.emit('finishedCompilation');
-						// set beekeeper program path
-						setTimeout(function(){ proc.stdin.write('code.c.bin\n'); }, 500);
 					});
 				});
 			});
@@ -233,7 +238,6 @@ io.on("connection", function (socket) {
 	socket.on('finish', function(code) {
 		if (proc !== 'undefined')
 		proc.stdin.write('exit\n');
-		proc.stdin.end();
 	});
 
 	socket.on('break', function(code) {
