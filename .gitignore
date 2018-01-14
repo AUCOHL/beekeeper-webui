@@ -1,8 +1,10 @@
-code.c
 code.c*
 code.c.bin_dump
 webui
 dump.vcd
 soc.json
-public/data/*
-!public/data/code-txt.js
+public/data/waveform-text.js
+public/data/waveform-data.js
+public/data/code.c.verilog.txt
+public/data/code.c.bin_dump
+public/data/code.c
