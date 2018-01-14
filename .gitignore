@@ -1,10 +1,8 @@
-code.c
-code.txt
-code.c.*
-*.bin
-*.bin_dump
-*.vcd
-*.v
+./code.c
+./code.c.*
+code.c.bin_dump
+webui
+dump.vcd
 package-lock.json
 soc.json
-package-lock.json
+public/data/*
