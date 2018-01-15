@@ -142,19 +142,26 @@ io.on("connection", function (socket) {
 							console.error(`iverilog failed: ${error3}.`);
 							socket.emit('error', error3);
 						}
-						// If a pervious process is alive, exit
-						if (proc !== undefined) proc.stdin.write('exit\n');
+						// If a pervious process is alive, kill it
+						if (proc !== undefined) proc.kill();
+						stepping = false;
 						// vvp -M/usr/local/bin/BeekeeperSupport -mBeekeeper code.c.bin_dump/Beekeeper.vvp
+						spawn('rm', ['-f', 'dump.vcd']);
 						proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', `${userData.codeCFile}.bin_dump/Beekeeper.vvp`]);
                        	proc.stdin.setEncoding('utf-8');
 						// set beekeeper program path
 						proc.stdin.write('code.c.bin\n');
 						// NOTE uncomment for debugging
-						// proc.stdout.pipe(process.stdout);
+						proc.stdout.pipe(process.stdout);
 						proc.stdout.on('data', (data) => {
 							global.data = data;
-							if (data.indexOf("JAL zero, 0") > -1) {
-								proc.stdin.write('exit');
+							// convert data object to string
+							data = "" + data;
+							if (data.includes('Invalid input')) {
+								socket.emit('message', "Sorry, you can't do that!");
+							}
+							else if (data.indexOf("JAL zero, 0") > -1) {
+								proc.kill();
 								storeVCD();
 								socket.emit("complete");
 							} else {
@@ -177,7 +184,8 @@ io.on("connection", function (socket) {
 								    address = "[" + address.substring(address.indexOf(' ') + 1, address.length) + "]";
 					            }
 								var lines = code.split('\n');
-								// get the code line TODO improve the loop
+								// get the code line
+								// TODO improve the loop
 								for(var i = 0;i < lines.length;i++){
 									if (step == i) codeLine = lines[i];
 								};
@@ -221,6 +229,17 @@ io.on("connection", function (socket) {
 		else proc.stdin.write('runff\n');
 	});
 
+	socket.on('breakpoints', function(breakpoints) {
+		if (breakpoints != "0") {
+			var number = 0;
+			var breakArray = breakpoints.split(",");
+			for (var i = 0; i < breakArray.length; i++) {
+				number = parseInt(breakArray[i]);
+				proc.stdin.write(`break ${userData.codeCFile}:${number}\n`);
+			}
+		}
+	});
+
 	socket.on('step', function(code) {
 		stepping = true;
 		proc.stdin.write('step\n');
@@ -235,15 +254,13 @@ io.on("connection", function (socket) {
 		socket.emit('response');
 	});
 
-	socket.on('finish', function(code) {
-		if (proc !== 'undefined')
-		proc.stdin.write('exit\n');
+	socket.on('stop', function(code) {
+		if (proc !== 'undefined') proc.stdin.write('exit\n');
 	});
 
-	socket.on('break', function(code) {
-		if (proc !== 'undefined')
-		proc.stdin.write('break\n');
-	});
+	socket.on('waveform', function(code) {
+		storeVCD();
+	})
 });
 
 // Bind the process exit event to our exit handler
