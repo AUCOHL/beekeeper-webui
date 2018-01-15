@@ -12,7 +12,6 @@ disableButton("compile", false);
 function disableRunButtons(state) {
 	document.getElementById("breakpoints").disabled = state;
 	document.getElementById("run").disabled = state;
-	document.getElementById("runff").disabled = state;
 	document.getElementById("step").disabled = state;
 	document.getElementById("stepi").disabled = state;
 	document.getElementById("stop").disabled = state;
@@ -28,21 +27,26 @@ function disableButton(id, state) {
 	document.getElementById(`${id}`).disabled = state;
 }
 
+function showLoadingOverlay() {
+	$('#section').loading({ circles: 3,overlay: true });
+}
 
-	function breakpointRun() {
-		if (run && breakpoints) {
-			showSnack("You can either step or view waveform now");
-			disableButton("run", true);
-			disableButton("runff", true);
-			return true;
-		}
-		return false;
+function hideLoadingOverlay() {
+	$('#section').loading({hide: true});
+}
+
+function breakpointRun() {
+	if (run && breakpoints) {
+		showSnack("You can either step or view waveform now");
+		disableButton("run", true);
+		return true;
 	}
-
+	return false;
+}
 
 $(document).ready(function () {
 	$( "#compile" ).click(function() {
-		$('#section').loading({ circles: 3,overlay: true });
+		showLoadingOverlay();
 	});
 })
 
@@ -85,13 +89,6 @@ socket.on('proceed', function() {
 		}
 	};
 
-	document.getElementById('runff').onclick = function () {
-		if (!breakpointRun()) {
-	 		run = true;
-			socket.emit('runff');
-		}
-	};
-
 	document.getElementById('step').onclick = function () {
 		socket.emit('step');
 	};
@@ -111,10 +108,10 @@ socket.on('proceed', function() {
 
 function showSnack(text) {
 	console.log("showSnack");
-	var x = document.getElementById("snackbar");
-	x.innerHTML = text;
-	x.className = "show";
-	setTimeout(function(){ x.className = x.className.replace("show", ""); }, snackbarTime);
+	var snackbar = document.getElementById("snackbar");
+	snackbar.innerHTML = text;
+	snackbar.className = "show";
+	setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, snackbarTime);
 }
 
 socket.on('response', function() {
@@ -133,17 +130,25 @@ socket.on('complete', function() {
 
 socket.on('finishedCompilation', function() {
 	compiled = true;
-	$('#section').loading({hide: true});
+	hideLoadingOverlay();
 	showSnack("Compiled successfully");
 	disableRunButtons(false);
 });
 
 socket.on('error', function(data) {
+	// This function was meant for much more than this. What a waste.
+	// I have no idea why I turned this into string but I'm too afraid to remove it now
 	showSnack(`${data}`);
-	document.getElementById("compile").disabled = false;
+	disableButton("compile", false);
 });
 
 socket.on('message', function(data) {
+	// Display message in snack and activate the compilation button
 	showSnack(data);
-	document.getElementById("compile").disabled = false;
+	disableButton("compile", false);
+});
+
+socket.on('saved', function(data) {
+	// Hide the loading overlay displayed while saving
+	hideLoadingOverlay();
 });

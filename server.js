@@ -112,8 +112,10 @@ io.on("connection", function (socket) {
 		storeFile(userData.codeCFile, code);
 		storeFile(userData.codeTextFile, "var code=`" + code + "`;");
 	}
+
 	socket.on('save', function (code) {
 		saveCode(code);
+		socket.emit('saved');
 	});
 
 	socket.on('compile', function (code) {
@@ -150,7 +152,7 @@ io.on("connection", function (socket) {
 						proc = spawn('vvp', [`-M/usr/local/bin/BeekeeperSupport`, '-mBeekeeper', `${userData.codeCFile}.bin_dump/Beekeeper.vvp`]);
                        	proc.stdin.setEncoding('utf-8');
 						// set beekeeper program path
-						proc.stdin.write('code.c.bin\n');
+						proc.stdin.write(`${userData.codeBinFile}\n`);
 						// NOTE uncomment for debugging
 						proc.stdout.pipe(process.stdout);
 						proc.stdout.on('data', (data) => {
