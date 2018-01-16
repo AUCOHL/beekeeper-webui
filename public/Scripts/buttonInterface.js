@@ -10,6 +10,7 @@ disableButton("save", false);
 disableButton("compile", false);
 
 function disableRunButtons(state) {
+	console.log("disabling " + state);
 	document.getElementById("breakpoints").disabled = state;
 	document.getElementById("run").disabled = state;
 	document.getElementById("step").disabled = state;
@@ -98,7 +99,7 @@ socket.on('proceed', function() {
 	};
 
 	document.getElementById('waveform').onclick = function () {
-		socket.emit('waveform');
+		// socket.emit('waveform');
 		newWindow.close();
 		// There are two different HTML templates, one for stepping and one for running
 		if (run) newWindow = window.open("waveform-viewer/waveform-viewer.html");
@@ -107,12 +108,23 @@ socket.on('proceed', function() {
 });
 
 function showSnack(text) {
-	console.log("showSnack");
 	var snackbar = document.getElementById("snackbar");
 	snackbar.innerHTML = text;
 	snackbar.className = "show";
 	setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, snackbarTime);
 }
+
+socket.on('saved', function(data) {
+	// Hide the loading overlay displayed while saving
+	showSnack("Saved Successfully");
+});
+
+socket.on('finishedCompilation', function() {
+	if (!compiled) disableRunButtons(false);
+	var compiled = true;
+	hideLoadingOverlay();
+	showSnack("Compiled successfully");
+});
 
 socket.on('response', function() {
 	newWindow.close();
@@ -121,34 +133,21 @@ socket.on('response', function() {
 });
 
 socket.on('complete', function() {
-    console.log("received complete signal");
+	console.log("mark here");
     showSnack("Program finished");
-	disableButton("compile", false);
 	disableRunButtons(true);
+	disableButton("compile", false);
 	document.getElementById("waveform").click();
 });
 
-socket.on('finishedCompilation', function() {
-	compiled = true;
-	hideLoadingOverlay();
-	showSnack("Compiled successfully");
-	disableRunButtons(false);
-});
 
 socket.on('error', function(data) {
 	// This function was meant for much more than this. What a waste.
 	// I have no idea why I turned this into string but I'm too afraid to remove it now
 	showSnack(`${data}`);
-	disableButton("compile", false);
 });
 
 socket.on('message', function(data) {
 	// Display message in snack and activate the compilation button
 	showSnack(data);
-	disableButton("compile", false);
-});
-
-socket.on('saved', function(data) {
-	// Hide the loading overlay displayed while saving
-	hideLoadingOverlay();
 });
