@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- Browser Tab Icon -->
-		<link rel="icon" type="image/png" sizes="16x16" href="Images/favicon.ico">
+		<link rel="icon" type="image/png" sizes="16x16" href="images/favicon.ico">
         <!-- Page Stylesheet -->
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
         <!-- Waveform body -->
@@ -19,7 +19,7 @@
         <script src="libs/bootstrap.min.js"></script> -->
 
         <!-- Ace -->
-        <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="libs/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 
         <link rel="stylesheet" type="text/css" href="libs/jqueryui/jquery-ui.css">
         <link rel="stylesheet" type="text/css" href="libs/jqueryui/jquery-ui.theme.css">
@@ -31,7 +31,7 @@
         <!-- Waveform canvas -->
         <link rel="stylesheet" type="text/css" href="css/waveform.css"></link>
         <!-- Waveform Canvas scripts -->
-        <script src="./js/waveform.js"></script>
+        <script src="js/waveform.js"></script>
 
         <!-- jquery loading spinner -->
         <script src="libs/jquery-loading.js"></script>
@@ -41,7 +41,7 @@
     <body id="body">
         <header>
             <!-- Top header bar logo -->
-			<a  href="https://cloudv.io"><img src='Images/logo-xxxs.png'></a></img>
+			<a  href="https://cloudv.io"><img src='images/logo-xxxs.png'></a></img>
         </header>
         <main>
             <!-- Load user saved code -->
@@ -54,7 +54,6 @@
                 <button class="toolbar-button" id="run">Run</button>
                 <button class="toolbar-button" id="step">Step</button>
                 <button class="toolbar-button" id="stepi">Step Instruction</button>
-                <button class="toolbar-button" id="waveform">Waveform</button>
                 <button class="toolbar-button" id="stop">Stop</button>
             </div>
             <!-- The snackbar -->
@@ -64,33 +63,30 @@
                 <div class="waveform-body" id="waveform-body">
             		<!-- Waveform Canvas -->
             		<div id="waveform-container"></div>
-            		<!-- Load waveform -->
-            		<script id="waveform-script" type="text/javascript" src="./data/waveform-data.js"></script>
-                    <script>
-
-                    </script>
+            		<!-- Load waveform data -->
+            		<script id="waveform-script" type="text/javascript" src="data/waveform-data.js"></script>
             	</div>
                 <!-- The ace editor host div -->
                 <div class="editor" id="editor">
                     <!-- Load footer text -->
-                    <script type="text/javascript" src="./data/waveform-text.js"></script>
+                    <script type="text/javascript" src="data/waveform-text.js"></script>
                     <!-- Footer to contain the disassembly -->
                     <footer class="hidden" id="footer"></footer>
                 </div>
                 <!-- Create ace instance and load it with user code -->
 				<script>
 				    var editor = ace.edit("editor");
-				    editor.setTheme("ace/theme/monokai");
-				    editor.getSession().setMode("ace/mode/c_cpp");
+                    editor.setTheme("ace/theme/twilight");
+                    editor.session.setMode("ace/mode/c_cpp");
 					editor.setValue(`${code}`);
 				</script>
             </section>
         </main>
         <!-- Socket.IO script -->
-		<script src="Scripts/socket.io.js"></script>
+		<script src="libs/socket.io.js"></script>
         <!-- Communication interface for buttons -->
-		<script src="Scripts/buttonInterface.js"></script>
+		<script src="js/buttonInterface.js"></script>
         <!-- Script to manage tab creation and deletion -->
-        <script src="Scripts/tabManager.js"></script>
+        <script src="js/tabManager.js"></script>
     </body>
 </html>
