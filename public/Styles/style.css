@@ -16,6 +16,7 @@ header img {
 
 body {
     margin: 0;
+    overflow: hidden;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
@@ -78,7 +79,6 @@ main {
     padding-bottom: 15px;
 }
 
-/* Editor */
 section {
     position: absolute;
     top: 10;
@@ -87,13 +87,24 @@ section {
     width: 100%;
     box-sizing: border-box;
     overflow: visible;
+    background-color: black;
 }
 
-section > #editor {
-    position: absolute;
+section > #waveform-body {
+    background-color: black;
+    float: right;
     top: 0;
     bottom: 0;
-    width: 100%;
+    width: 50%;
+    overflow: auto;
+}
+
+/* Editor */
+section > #editor {
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 50%;
 	font-family: monospace;
 }
 

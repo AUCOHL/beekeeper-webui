@@ -8,6 +8,8 @@ var breakpoints = false;
 var newWindow = window;
 // Change this value if you want the snackbar to appear longer or shorter
 var snackbarTime = 4000;
+var waveform;
+var ranOnce = false;
 
 initialize();
 
@@ -64,7 +66,7 @@ Display loading spinner
 Change section to body if you want to cover the whole page
 */
 function showLoadingOverlay() {
-	$('#section').loading({circles: 3, overlay: true, base: 1.0});
+	// $('#section').loading({circles: 3, overlay: true, base: 1.0});
 }
 
 /*
@@ -72,29 +74,35 @@ Display loading spinner
 Change section according to showLoadingOverlay
 */
 function hideLoadingOverlay() {
-	$('#section').loading({hide: true, destroy:true});
+	// $('#section').loading({hide: true, destroy:true});
 }
 
 // The socket receives the proceed signal when server first initiliazes
 socket.on('proceed', function() {
 
 	document.getElementById("save").onclick =
-	function (code) {
+	function () {
 		// Get the code from the editor
-		var code = editor.getValue();
+		code = editor.getValue();
 		// Tell the server to save the code
 		socket.emit('save', code);
 	};
 
 	document.getElementById("compile").onclick =
-	function (code) {
+	function () {
 		showLoadingOverlay();
-		if(editor.session.getLength < 1) alert("There is no code in the editor");
+		if(editor.session.getLength < 1) {
+			alert("There is no code in the editor");
+		}
+		else if(editor.getValue() === code && ranOnce) {
+			showSnack("Code hasn't changed");
+		}
 		else {
+			ranOnce = true;
 			disableButton("compile", true);
 			disableButton("stop", false);
 			run = false;
-			var code = editor.getValue();
+			code = editor.getValue();
 			socket.emit('compile', code);
 		}
 	};
@@ -181,24 +189,26 @@ Signal response is received when a step is done or a run is finished
 */
 socket.on('response', function() {
 	// Close the previosly opened window
-	newWindow.close();
+	// newWindow.close();
 	// There are two templates, the one with footer for stepping mode the first is for running
-	if (run) newWindow = window.open("waveform-viewer/waveform-viewer.html");
-	else newWindow = window.open("waveform-viewer/waveform-footer.html");
+	// if (run) newWindow = window.open("waveform-viewer/waveform-viewer.html");
+	// else newWindow = window.open("waveform-viewer/waveform-footer.html");
 });
 
 /*
 Signal complete is received when the code execution is finished
 */
 socket.on('complete', function() {
+	if (waveform != undefined) delete waveform;
+	document.getElementById('waveform-container').innerHTML = "";
+	waveform = new Waveform('waveform-container', data_cntr, null);
+	waveform.setOnChangeListener(function(e){console.log(e);});
 	// tell the user the program finished
     showSnack("Program finished");
 	// disable run buttons
 	disableRunButtons(true);
 	// enable compile button
 	disableButton("compile", false);
-	// display waveform
-	document.getElementById("waveform").click();
 });
 
 socket.on('stopped', function() {
@@ -210,8 +220,11 @@ socket.on('stopped', function() {
 This function was meant for much more than this. What a waste.
 */
 socket.on('error', function(data) {
+	// To show proper message for xhr poll error
+	if (data.includes('xhr')) showSnack('Connection to server lost, please refresh page');
 	// I have no idea why I turned this into string but I'm too afraid to remove it now
-	showSnack(`${data}`);
+	else showSnack(`${data}`);
+
 });
 
 /*

@@ -1,0 +1,11 @@
+.hidden {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+
+.visible {
+    visibility: visible;
+    width: 50;
+    height: 50;
+}

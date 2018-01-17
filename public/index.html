@@ -4,20 +4,40 @@
         <title>CloudV Simulator</title>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <!-- Browser Tab Icon -->
 		<link rel="icon" type="image/png" sizes="16x16" href="Images/favicon.ico">
         <!-- Page Stylesheet -->
-        <link rel="stylesheet" type="text/css" href="Styles/style.css"></link>
-        <!-- Bootstrap Stylesheet -->
-        <link rel="stylesheet" type="text/css" href="Styles/bootstrap.min.css"></link>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <!-- Waveform body -->
+        <link rel="stylesheet" type="text/css" href="css/waveform-viewer.css"></link>
+
         <!-- Lib inclusions -->
-        <script type="text/javascript" charset="utf-8" src="Scripts/jquery.js"></script>
-        <script src="Scripts/bootstrap.min.js"></script>
-        <!-- <script src="https://use.fontawesome.com/4ef6481b3d.js"></script> -->
+
+        <!-- Bootstrap -->
+        <!-- <link rel="stylesheet" type="text/css" href="libs/bootstrap.min.css"></link>
+        <script src="libs/bootstrap.min.js"></script> -->
+
+        <!-- Ace -->
+        <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+
+        <link rel="stylesheet" type="text/css" href="libs/jqueryui/jquery-ui.css">
+        <link rel="stylesheet" type="text/css" href="libs/jqueryui/jquery-ui.theme.css">
+        <link rel="stylesheet" type="text/css" href="css/waveform.css">
+        <script src="libs/fabric/fabric.js"></script>
+        <script src="libs/jqueryui/external/jquery/jquery.js"></script>
+        <script src="libs/jqueryui/jquery-ui.js"></script>
+
+        <!-- Waveform canvas -->
+        <link rel="stylesheet" type="text/css" href="css/waveform.css"></link>
+        <!-- Waveform Canvas scripts -->
+        <script src="./js/waveform.js"></script>
+
         <!-- jquery loading spinner -->
-        <link href="Styles/jquery-loading.css" rel="stylesheet"></link>
-        <script src="Scripts/jquery-loading.js"></script>
+        <script src="libs/jquery-loading.js"></script>
+        <link href="libs/jquery-loading.css" rel="stylesheet"></link>
     </head>
+
     <body id="body">
         <header>
             <!-- Top header bar logo -->
@@ -36,15 +56,27 @@
                 <button class="toolbar-button" id="stepi">Step Instruction</button>
                 <button class="toolbar-button" id="waveform">Waveform</button>
                 <button class="toolbar-button" id="stop">Stop</button>
-                <!-- The snackbar -->
-                <div id="snackbar"></div>
             </div>
-
+            <!-- The snackbar -->
+            <div id="snackbar"></div>
+            <!-- Main body section containing waveform and editor -->
             <section id="section">
+                <div class="waveform-body" id="waveform-body">
+            		<!-- Waveform Canvas -->
+            		<div id="waveform-container"></div>
+            		<!-- Load waveform -->
+            		<script id="waveform-script" type="text/javascript" src="./data/waveform-data.js"></script>
+                    <script>
+
+                    </script>
+            	</div>
                 <!-- The ace editor host div -->
-                <div class="editor" id="editor"></div>
-                <!-- Ace script -->
-				<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+                <div class="editor" id="editor">
+                    <!-- Load footer text -->
+                    <script type="text/javascript" src="./data/waveform-text.js"></script>
+                    <!-- Footer to contain the disassembly -->
+                    <footer class="hidden" id="footer"></footer>
+                </div>
                 <!-- Create ace instance and load it with user code -->
 				<script>
 				    var editor = ace.edit("editor");
@@ -55,10 +87,10 @@
             </section>
         </main>
         <!-- Socket.IO script -->
-		<script type="text/javascript" charset="utf-8" src="Scripts/socket.io.js"></script>
+		<script src="Scripts/socket.io.js"></script>
         <!-- Communication interface for buttons -->
-		<script type="text/javascript" charset="utf-8" src="Scripts/buttonInterface.js"></script>
+		<script src="Scripts/buttonInterface.js"></script>
         <!-- Script to manage tab creation and deletion -->
-        <script type="text/javascript" charset="utf-8" src="Scripts/tabManager.js"></script>
+        <script src="Scripts/tabManager.js"></script>
     </body>
 </html>
