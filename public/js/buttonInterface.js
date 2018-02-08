@@ -4,12 +4,16 @@ var socket = io.connect('http://localhost:9000');
 var run = false;
 // Keep track of whether beekeeper will stop for breakpoints
 var breakpoints = false;
-// Create the new window object for waveform
-var newWindow = window;
 // Change this value if you want the snackbar to appear longer or shorter
-var snackbarTime = 4000;
+var snackbarTime = 3000;
 var waveform;
 var ranOnce = false;
+var first = true;
+var status = {
+	run: false,
+	breakpoints: false,
+	ranOnce: false
+}
 
 initialize();
 
@@ -79,7 +83,8 @@ function hideLoadingOverlay() {
 
 // The socket receives the proceed signal when server first initiliazes
 socket.on('proceed', function() {
-
+	// waveform = new Waveform('wave', data_cntr, null);
+	// waveform.setOnChangeListener(function(e){console.log(e);});
 	document.getElementById("save").onclick =
 	function () {
 		// Get the code from the editor
@@ -114,7 +119,8 @@ socket.on('proceed', function() {
 		var breakpoints = "0";
 		while (breakpoints != null) {
 			var breakpoints = prompt("Specify the line numbers seperated by commas:");
-			if (breakpoints.includes("0") || breakpoints.includes(`${maxNumber+1}`)) {
+			if (breakpoints === null) break;
+			else if (breakpoints.includes("0") || breakpoints.includes(`${maxNumber+1}`)) {
  				alert(`Numbers should be between 1 and ${maxNumber}`);
 			} else break;
 		}
@@ -156,7 +162,7 @@ function showSnack(text) {
 /*
 Signal saved is received when code is saved to file
 */
-socket.on('saved', function(data) {
+socket.on('returnSaved', function(data) {
 	// Hide the loading overlay displayed while saving
 	showSnack("Saved Successfully");
 });
@@ -164,7 +170,10 @@ socket.on('saved', function(data) {
 /*
 Signal finishedCompilation is received when compiling code is complete
 */
-socket.on('finishedCompilation', function() {
+socket.on('returnCompiled', function() {
+	if (waveform != undefined) {
+		delete waveform;
+	}
 	// Set the compiled flag to true
 	var compiled = true;
 	// hide the overlay displayed by compile button click
@@ -176,19 +185,13 @@ socket.on('finishedCompilation', function() {
 });
 
 /*
-Signal response is received when a step is done or a run is finished
+Signal is received when a step is done or a run is finished
 */
-socket.on('response', function() {
-});
-
-/*
-Signal complete is received when the code execution is finished
-*/
-socket.on('complete', function() {
-	if (waveform != undefined) delete waveform;
-	document.getElementById('waveform-container').innerHTML = "";
-	waveform = new Waveform('waveform-container', data_cntr, null);
-	waveform.setOnChangeListener(function(e){console.log(e);});
+socket.on('returnStep', function() {
+	document.getElementById('wave').innerHTML = "";
+	new Waveform('wave', data_cntr, null);
+	// waveform._data = data_cntr;
+	// waveform.resetTimingDiagram();
 	// tell the user the program finished
     showSnack("Program finished");
 	// disable run buttons
@@ -196,8 +199,33 @@ socket.on('complete', function() {
 	// enable compile button
 	disableButton("compile", false);
 });
+// waveform = new Waveform('wave', data_cntr, null);
+/*
+Signal is received when the code execution is finished
+*/
+socket.on('returnRun', function(data) {
+	if(first) first = false;
+	else {
+		data = data.replace(/,\s*\]/gm, ']');
+		data = data.replace(/,\s*\}/gm, '}');
+		data = data.replace(/\\/gm, '\\\\');
+		var wave_data = JSON.parse(data);
+		document.getElementById('wave').innerHTML = "";
+		waveform = new Waveform('wave', wave_data, null);
+		// tell the user the program finished
+	    showSnack("Program finished");
+		// disable run buttons
+		disableRunButtons(true);
+		// enable compile button
+		disableButton("compile", false);
+		first = true;
+	}
+});
 
-socket.on('stopped', function() {
+/*
+Signal is received when beekeeper is killed
+*/
+socket.on('returnStop', function() {
 	showSnack("Beekeeper Killed");
 	initialize();
 });
@@ -207,10 +235,10 @@ This function was meant for much more than this. What a waste.
 */
 socket.on('error', function(data) {
 	// To show proper message for xhr poll error
+	// TODO need to handle xhr poll error correctly
 	if (data.includes('xhr')) showSnack('Connection to server lost, please refresh page');
 	// I have no idea why I turned this into string but I'm too afraid to remove it now
 	else showSnack(`${data}`);
-
 });
 
 /*

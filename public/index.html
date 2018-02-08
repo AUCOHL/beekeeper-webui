@@ -9,15 +9,13 @@
 		<link rel="icon" type="image/png" sizes="16x16" href="images/favicon.ico">
         <!-- Page Stylesheet -->
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <!-- Waveform body -->
-        <link rel="stylesheet" type="text/css" href="css/waveform-viewer.css"></link>
 
         <!-- Lib inclusions -->
-
-        <!-- Bootstrap -->
-        <!-- <link rel="stylesheet" type="text/css" href="libs/bootstrap.min.css"></link>
-        <script src="libs/bootstrap.min.js"></script> -->
-
+        <!-- Font Awesome for toolbar button icons -->
+        <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+        <!-- Bootstrap for toolbar button style -->
+        <link rel="stylesheet" type="text/css" href="libs/bootstrap.min.css"></link>
+        <!-- <script src="libs/bootstrap.min.js"></script> -->
         <!-- Ace -->
         <script src="libs/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 
@@ -28,11 +26,12 @@
         <script src="libs/jqueryui/external/jquery/jquery.js"></script>
         <script src="libs/jqueryui/jquery-ui.js"></script>
 
+
+        <script src="libs/watch.js"></script>
         <!-- Waveform canvas -->
         <link rel="stylesheet" type="text/css" href="css/waveform.css"></link>
         <!-- Waveform Canvas scripts -->
         <script src="js/waveform.js"></script>
-
         <!-- jquery loading spinner -->
         <script src="libs/jquery-loading.js"></script>
         <link href="libs/jquery-loading.css" rel="stylesheet"></link>
@@ -41,20 +40,20 @@
     <body id="body">
         <header>
             <!-- Top header bar logo -->
-			<a  href="https://cloudv.io"><img src='images/logo-xxxs.png'></a></img>
+			<a href="https://cloudv.io"><img src='images/logo-xxxs.png'></a></img>
         </header>
         <main>
             <!-- Load user saved code -->
             <script src="data/code-text.js"></script>
             <!-- Top Button toolbar -->
             <div id="toolbar" class="toolbar">
-                <button class="toolbar-button" id="save">Save</button>
-                <button class="toolbar-button" id="compile">Compile</button>
-                <button class="toolbar-button" id="breakpoints">Breakpoints</button>
-                <button class="toolbar-button" id="run">Run</button>
-                <button class="toolbar-button" id="step">Step</button>
-                <button class="toolbar-button" id="stepi">Step Instruction</button>
-                <button class="toolbar-button" id="stop">Stop</button>
+                <button class="btn btn-primary" title="Save" id="save"> <i class="fa fa-save"></i></button>
+                <button class="btn btn-primary" title="Compile" id="compile"> <i class="fa fa-cogs"></i></button>
+                <button class="btn btn-primary" title="Run" id="run"> <i class="fa fa-chevron-circle-right"></i></i></button>
+                <button class="btn btn-primary" title="Step Instruction" id="stepi"> <i class="fa fa-angle-right"></i></button>
+                <button class="btn btn-primary" title="Step" id="step"> <i class="fa fa-angle-double-right"></i></button>
+                <button class="btn btn-primary" title="Breakpoints" id="breakpoints"> <i class="fa fa-bug"></i></button>
+                <button class="hidden" title="Stop" id="stop"></button>
             </div>
             <!-- The snackbar -->
             <div id="snackbar"></div>
@@ -62,9 +61,9 @@
             <section id="section">
                 <div class="waveform-body" id="waveform-body">
             		<!-- Waveform Canvas -->
-            		<div id="waveform-container"></div>
+            		<div id="wave"></div>
             		<!-- Load waveform data -->
-            		<script id="waveform-script" type="text/javascript" src="data/waveform-data.js"></script>
+            		<script type="text/javascript" src="data/waveform-data.js"></script>
             	</div>
                 <!-- The ace editor host div -->
                 <div class="editor" id="editor">

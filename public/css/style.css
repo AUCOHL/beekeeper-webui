@@ -74,16 +74,30 @@ main {
 .toolbar-button {
     margin: 5px;
     height: 25px;
-    color: white;
+    /*color: black;
+    background: white;*/
     text-align: center;
     padding-bottom: 15px;
 }
+
+.hidden {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+
+.visible {
+    visibility: visible;
+    width: 50%;
+    height: 20%;
+}
+
 
 section {
     position: absolute;
     top: 10;
     /* My OCD is acting up*/
-    height: 96.1%;
+    height: 96.2%;
     left: 0;
     width: 100%;
     box-sizing: border-box;

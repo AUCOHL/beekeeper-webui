@@ -40,11 +40,19 @@ class Waveform
 					SIGNAL_NAME_RECT: 0.2
 					SIGNAL_HIGHLIGHT: 0.3
 					SIGNAL_DRAGGED: 0.3
+	clone = (obj) ->
+		return obj  if obj is null or typeof (obj) isnt "object"
+		temp = new obj.constructor()
+		for key of obj
+			temp[key] = clone(obj[key])
+		temp
 
 	constructor: (@_containerId, @_data, @_initDiagram) ->
 		@_container = $("##{@_containerId}")
 		return null unless @_container.length
 		return null unless @_data.signal?
+		@_data = clone(@_data)
+		@_initDiagram = clone(@_initDiagram)
 
 		@_data.signal.sort (firstSignal, secondSignal) ->
 			if firstSignal.name < secondSignal.name
@@ -969,7 +977,7 @@ class Waveform
 		@refreshCurrentValues()
 		@refreshSignalValues()
 		if changed
-		  @redraw()
+			@redraw()
 
 	isBus: (signalName) ->
 		matches = /[\s\S]+\[(\d+)\:(\d+)\]\s*/.exec signalName
