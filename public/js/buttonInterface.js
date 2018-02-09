@@ -19,6 +19,8 @@ initialize();
 
 // As the app starts, disable all buttons except save and compile
 function initialize() {
+	document.getElementById('console').innerHTML = "";
+	document.getElementById('waveform-body').innerHTML = "";
 	disableAllButtons(true);
 	disableButton("save", false);
 	disableButton("compile", false);
@@ -79,6 +81,18 @@ Change section according to showLoadingOverlay
 */
 function hideLoadingOverlay() {
 	// $('#section').loading({hide: true, destroy:true});
+}
+
+function createWaveform(data) {
+	if (waveform != undefined) {
+		delete waveform;
+	}
+	data = data.replace(/,\s*\]/gm, ']');
+	data = data.replace(/,\s*\}/gm, '}');
+	data = data.replace(/\\/gm, '\\\\');
+	var wave_data = JSON.parse(data);
+	document.getElementById('waveform-body').innerHTML = "";
+	waveform = new Waveform('waveform-body', wave_data, null);
 }
 
 // The socket receives the proceed signal when server first initiliazes
@@ -149,6 +163,7 @@ socket.on('proceed', function() {
 	document.getElementById('stop').onclick =
 	function () {
 		socket.emit('stop');
+		initialize();
 	};
 });
 
@@ -171,9 +186,6 @@ socket.on('returnSaved', function(data) {
 Signal finishedCompilation is received when compiling code is complete
 */
 socket.on('returnCompiled', function() {
-	if (waveform != undefined) {
-		delete waveform;
-	}
 	// Set the compiled flag to true
 	var compiled = true;
 	// hide the overlay displayed by compile button click
@@ -187,31 +199,27 @@ socket.on('returnCompiled', function() {
 /*
 Signal is received when a step is done or a run is finished
 */
-socket.on('returnStep', function() {
-	document.getElementById('wave').innerHTML = "";
-	new Waveform('wave', data_cntr, null);
-	// waveform._data = data_cntr;
-	// waveform.resetTimingDiagram();
-	// tell the user the program finished
-    showSnack("Program finished");
-	// disable run buttons
-	disableRunButtons(true);
-	// enable compile button
-	disableButton("compile", false);
+socket.on('returnStep', function(data, disassembly) {
+	createWaveform(data);
+	document.getElementById('console').innerHTML = disassembly;
+	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
 });
+
+socket.on('returnStepi', function(data, disassembly) {
+	createWaveform(data);
+	document.getElementById('console').innerHTML = disassembly;
+	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+});
+
 // waveform = new Waveform('wave', data_cntr, null);
 /*
 Signal is received when the code execution is finished
 */
-socket.on('returnRun', function(data) {
+socket.on('returnRun', function(data, disassembly) {
 	if(first) first = false;
 	else {
-		data = data.replace(/,\s*\]/gm, ']');
-		data = data.replace(/,\s*\}/gm, '}');
-		data = data.replace(/\\/gm, '\\\\');
-		var wave_data = JSON.parse(data);
-		document.getElementById('wave').innerHTML = "";
-		waveform = new Waveform('wave', wave_data, null);
+		createWaveform(data);
+		document.getElementById('console').innerHTML = disassembly;
 		// tell the user the program finished
 	    showSnack("Program finished");
 		// disable run buttons

@@ -26,7 +26,6 @@
         <script src="libs/jqueryui/external/jquery/jquery.js"></script>
         <script src="libs/jqueryui/jquery-ui.js"></script>
 
-
         <script src="libs/watch.js"></script>
         <!-- Waveform canvas -->
         <link rel="stylesheet" type="text/css" href="css/waveform.css"></link>
@@ -53,25 +52,22 @@
                 <button class="btn btn-primary" title="Step Instruction" id="stepi"> <i class="fa fa-angle-right"></i></button>
                 <button class="btn btn-primary" title="Step" id="step"> <i class="fa fa-angle-double-right"></i></button>
                 <button class="btn btn-primary" title="Breakpoints" id="breakpoints"> <i class="fa fa-bug"></i></button>
-                <button class="hidden" title="Stop" id="stop"></button>
+                <button class="btn btn-primary" title="Stop" id="stop"><i class="fas fa-stop-circle"></i></button>
             </div>
             <!-- The snackbar -->
             <div id="snackbar"></div>
             <!-- Main body section containing waveform and editor -->
             <section id="section">
-                <div class="waveform-body" id="waveform-body">
-            		<!-- Waveform Canvas -->
-            		<div id="wave"></div>
-            		<!-- Load waveform data -->
-            		<script type="text/javascript" src="data/waveform-data.js"></script>
-            	</div>
+                <!-- Waveform viewer host -->
+                <div class="waveform-body" id="waveform-body"></div>
                 <!-- The ace editor host div -->
-                <div class="editor" id="editor">
-                    <!-- Load footer text -->
-                    <script type="text/javascript" src="data/waveform-text.js"></script>
-                    <!-- Footer to contain the disassembly -->
-                    <footer class="hidden" id="footer"></footer>
-                </div>
+                <div class="editor" id="editor"></div>
+                <!-- Load footer text -->
+                <script type="text/javascript" src="data/waveform-text.js"></script>
+                <!-- Footer to contain the disassembly -->
+                <footer>
+                    <div id='console'></div>
+                </footer>
                 <!-- Create ace instance and load it with user code -->
 				<script>
 				    var editor = ace.edit("editor");
