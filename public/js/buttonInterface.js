@@ -2,25 +2,30 @@
 var socket = io.connect('http://localhost:9000');
 // Keep track of whether we're running or stepping
 var run = false;
-// Keep track of whether beekeeper will stop for breakpoints
-var breakpoints = false;
 // Change this value if you want the snackbar to appear longer or shorter
 var snackbarTime = 3000;
 var waveform;
-var ranOnce = false;
-var first = true;
 var status = {
+	compiled: false,
 	run: false,
+	// Keep track of whether beekeeper will stop for breakpoints
 	breakpoints: false,
-	ranOnce: false
+	ranOnce: false,
+	first: true
 }
 
 initialize();
 
 // As the app starts, disable all buttons except save and compile
 function initialize() {
+	$("#footer").addClass('hidden');
 	document.getElementById('console').innerHTML = "";
 	document.getElementById('waveform-body').innerHTML = "";
+	status.compiled = false;
+	status.run = false;
+	status.breakpoints = false;
+	status.first = true;
+	status.ranOnce = false;
 	disableAllButtons(true);
 	disableButton("save", false);
 	disableButton("compile", false);
@@ -72,7 +77,7 @@ Display loading spinner
 Change section to body if you want to cover the whole page
 */
 function showLoadingOverlay() {
-	// $('#section').loading({circles: 3, overlay: true, base: 1.0});
+	$('#section').loading({circles: 3, overlay: true, base: 1.0});
 }
 
 /*
@@ -80,7 +85,7 @@ Display loading spinner
 Change section according to showLoadingOverlay
 */
 function hideLoadingOverlay() {
-	// $('#section').loading({hide: true, destroy:true});
+	$('#section').loading({hide: true, destroy:true});
 }
 
 function createWaveform(data) {
@@ -88,8 +93,8 @@ function createWaveform(data) {
 		delete waveform;
 	}
 	data = data.replace(/,\s*\]/gm, ']');
-	data = data.replace(/,\s*\}/gm, '}');
-	data = data.replace(/\\/gm, '\\\\');
+	// data = data.replace(/,\s*\}/gm, '}');
+	// data = data.replace(/\\/gm, '\\\\');
 	var wave_data = JSON.parse(data);
 	document.getElementById('waveform-body').innerHTML = "";
 	waveform = new Waveform('waveform-body', wave_data, null);
@@ -109,18 +114,18 @@ socket.on('proceed', function() {
 
 	document.getElementById("compile").onclick =
 	function () {
-		showLoadingOverlay();
 		if(editor.session.getLength < 1) {
 			alert("There is no code in the editor");
 		}
-		else if(editor.getValue() === code && ranOnce) {
+		else if(editor.getValue() === code && status.ranOnce) {
 			showSnack("Code hasn't changed");
 		}
 		else {
-			ranOnce = true;
+			showLoadingOverlay();
+			initialize();
+			status.ranOnce = true;
 			disableButton("compile", true);
 			disableButton("stop", false);
-			run = false;
 			code = editor.getValue();
 			socket.emit('compile', code);
 		}
@@ -133,20 +138,22 @@ socket.on('proceed', function() {
 		var breakpoints = "0";
 		while (breakpoints != null) {
 			var breakpoints = prompt("Specify the line numbers seperated by commas:");
-			if (breakpoints === null) break;
+			if (breakpoints === null) return;
 			else if (breakpoints.includes("0") || breakpoints.includes(`${maxNumber+1}`)) {
  				alert(`Numbers should be between 1 and ${maxNumber}`);
-			} else break;
+			} else return;
 		}
+		status.breakpoints = true;
 		socket.emit('breakpoints', breakpoints);
 	};
 
 	document.getElementById('run').onclick =
 	function () {
-		run = true;
-		state = breakpointRun();
-		if (!state) {
+		status.run = true;
+		if (!status.breakpoints) {
 			socket.emit('run');
+		} else {
+			socket.emit('continue');
 		}
 	};
 
@@ -187,7 +194,7 @@ Signal finishedCompilation is received when compiling code is complete
 */
 socket.on('returnCompiled', function() {
 	// Set the compiled flag to true
-	var compiled = true;
+	status.compiled = true;
 	// hide the overlay displayed by compile button click
 	hideLoadingOverlay();
 	// Tell the user the code compiled
@@ -200,13 +207,13 @@ socket.on('returnCompiled', function() {
 Signal is received when a step is done or a run is finished
 */
 socket.on('returnStep', function(data, disassembly) {
-	createWaveform(data);
+	// createWaveform(data);
 	document.getElementById('console').innerHTML = disassembly;
 	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
 });
 
 socket.on('returnStepi', function(data, disassembly) {
-	createWaveform(data);
+	// createWaveform(data);
 	document.getElementById('console').innerHTML = disassembly;
 	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
 });
@@ -216,7 +223,11 @@ socket.on('returnStepi', function(data, disassembly) {
 Signal is received when the code execution is finished
 */
 socket.on('returnRun', function(data, disassembly) {
-	if(first) first = false;
+console.log('run');
+	if(status.first){
+		 status.first = false;
+		 console.log('first');
+	}
 	else {
 		createWaveform(data);
 		document.getElementById('console').innerHTML = disassembly;
@@ -226,7 +237,7 @@ socket.on('returnRun', function(data, disassembly) {
 		disableRunButtons(true);
 		// enable compile button
 		disableButton("compile", false);
-		first = true;
+		// status.first = true;
 	}
 });
 

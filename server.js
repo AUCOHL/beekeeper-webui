@@ -99,7 +99,7 @@ Monitor runningFinished state value for switch.
 Only release finishRun() if the value changes.
 */
 AsyncWatch(state, 'runningFinished', function(oldValue, newValue){
-	if (newValue !== oldValue) {
+	if (newValue !== oldValue && !newValue) {
 		// console.log('emitting');
 		eventEmitter.emit('runFinished');
 	}
@@ -112,7 +112,7 @@ AsyncWatch(procData, 'vcdDump', function(oldValue, newValue){
 	else if (state.stepi) {
 		socket.emit('returnStepi', procData.vcdDump, procData.parsedDisassembly);
 	}
-	else {
+	else if (state.run && state.runningFinished){
 		console.log(procData.parsedDisassembly);
 		socket.emit('returnRun', procData.vcdDump, procData.parsedDisassembly);
 	}
@@ -292,6 +292,7 @@ function setProcessParams() {
 
 /*
 TODO simplify this function
+This is where all the interaction with the beekeeper process takes place
 */
 function setBeekeeperDataStream() {
 	procData.proc.stdout.on('data', (data) => {
@@ -307,8 +308,7 @@ function setBeekeeperDataStream() {
 		else if (data.includes('initialized') || data.includes('beekeeper') || data.includes('path') || data.includes('Running')) {}
 		else {
 			procData.parsedDisassembly += data;
-			procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)/g, '<br />');;
-			// procData.parsedDisassembly += "<br/>";
+			procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)/g, '<br/>');;
 			// get instructions
 			var instruction = procData.processData.substring(0, procData.processData.indexOf("["));
 			// get instruction address
