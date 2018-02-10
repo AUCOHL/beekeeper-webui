@@ -51,7 +51,7 @@
                 <button class="btn btn-primary" title="Run" id="run"> <i class="fa fa-chevron-circle-right"></i></i></button>
                 <button class="btn btn-primary" title="Step Instruction" id="stepi"> <i class="fa fa-angle-right"></i></button>
                 <button class="btn btn-primary" title="Step" id="step"> <i class="fa fa-angle-double-right"></i></button>
-                <button class="btn btn-primary" title="Breakpoints" id="breakpoints"> <i class="fa fa-bug"></i></button>
+                <button class="btn btn-primary" title="Clear Breakpoints" id="breakpoints"> <i class="fa fa-bug"></i></button>
                 <button class="btn btn-primary" title="Stop" id="stop"><i class="fas fa-stop-circle"></i></button>
             </div>
             <!-- The snackbar -->
@@ -63,16 +63,14 @@
                 <!-- The ace editor host div -->
                 <div class="editor" id="editor"></div>
                 <!-- Footer to contain the disassembly -->
-                <footer>
-                    <div id='console'></div>
+                <footer id="footer">
+                    <div id="console"></div>
                 </footer>
-                <!-- Create ace instance and load it with user code -->
-				<script>
-				    var editor = ace.edit("editor");
-                    editor.setTheme("ace/theme/twilight");
-                    editor.session.setMode("ace/mode/c_cpp");
-					editor.setValue(`${code}`);
-				</script>
+                <script>
+                    var editor = ace.edit("editor");
+                	editor.setTheme("ace/theme/twilight");
+                	editor.session.setMode("ace/mode/c_cpp");
+                </script>
             </section>
         </main>
         <!-- Socket.IO script -->

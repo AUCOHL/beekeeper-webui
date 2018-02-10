@@ -18,6 +18,7 @@ initialize();
 
 // As the app starts, disable all buttons except save and compile
 function initialize() {
+	initializeAce();
 	$("#footer").addClass('hidden');
 	document.getElementById('console').innerHTML = "";
 	document.getElementById('waveform-body').innerHTML = "";
@@ -29,6 +30,47 @@ function initialize() {
 	disableAllButtons(true);
 	disableButton("save", false);
 	disableButton("compile", false);
+	document.getElementById('footer').style.visibility = 'hidden';
+	document.getElementById('waveform-body').style.visibility = 'hidden';
+	document.getElementById('editor').style.width = '100%';
+	document.getElementById('editor').style.height = '100%';
+}
+
+function initializeAce() {
+	editor.setValue(`${code}`);
+	editor.renderer.setShowGutter(true);
+	decorateAce(editor);
+}
+
+function decorateAce(editor) {
+	editor.on("guttermousedown", function(e){
+		var target = e.domEvent.target;
+		if (target.className.indexOf("ace_gutter-cell") == -1){
+			return;
+		}
+		if (!editor.isFocused()){
+			return;
+		}
+		if (e.clientX > 25 + target.getBoundingClientRect().left){
+			return;
+		}
+		var row = e.getDocumentPosition().row;
+		var breakpointsArray = e.editor.session.getBreakpoints();
+		if(!(row in breakpointsArray)){
+			if (row === 0 || row === e.editor.session.getLength() -1) {}
+			else {
+				e.editor.session.addGutterDecoration(row, '.ace_gutter-cell.ace_breakpoint');
+				e.editor.session.setBreakpoint(row);
+			}
+		}else{
+			e.editor.session.addGutterDecoration(row, 'white');
+			e.editor.session.clearBreakpoint(row);
+		}
+			e.stop();
+	});
+	editor.session.on("changeBreakpoint", function(e){
+	// captures set and clear breakpoint events
+	});
 }
 
 /*
@@ -44,7 +86,6 @@ function disableAllButtons(state) {
 Disable or enable run buttons according to state
 */
 function disableRunButtons(state) {
-	document.getElementById("breakpoints").disabled = state;
 	document.getElementById("run").disabled = state;
 	document.getElementById("step").disabled = state;
 	document.getElementById("stepi").disabled = state;
@@ -100,79 +141,96 @@ function createWaveform(data) {
 	waveform = new Waveform('waveform-body', wave_data, null);
 }
 
-// The socket receives the proceed signal when server first initiliazes
-socket.on('proceed', function() {
-	// waveform = new Waveform('wave', data_cntr, null);
-	// waveform.setOnChangeListener(function(e){console.log(e);});
-	document.getElementById("save").onclick =
-	function () {
-		// Get the code from the editor
-		code = editor.getValue();
-		// Tell the server to save the code
-		socket.emit('save', code);
-	};
+function displayReturn(data, disassembly) {
+	document.getElementById('footer').style.visibility = 'visible';
+	document.getElementById('waveform-body').style.visibility = 'visible';
+	document.getElementById('editor').style.width = '50%';
+	document.getElementById('editor').style.height = '75%';
+	createWaveform(data);
+	document.getElementById('console').innerHTML = disassembly;
+	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+}
 
-	document.getElementById("compile").onclick =
-	function () {
-		if(editor.session.getLength < 1) {
-			alert("There is no code in the editor");
+/*
+* For some reason, god know what, the return of getBreakpoints is offset by 1 for each element
+* And length returns double the actual length!
+*/
+function getBreakpoints () {
+	var array = editor.session.getBreakpoints();
+	var breakpoints = [];
+	for (var key in array) {
+		if (array[key] === 'ace_breakpoint') {
+			breakpoints.push(parseInt(key)+1);
 		}
-		else if(editor.getValue() === code && status.ranOnce) {
-			showSnack("Code hasn't changed");
-		}
-		else {
-			showLoadingOverlay();
-			initialize();
-			status.ranOnce = true;
-			disableButton("compile", true);
-			disableButton("stop", false);
-			code = editor.getValue();
-			socket.emit('compile', code);
-		}
-	};
+	}
+	socket.emit('breakpoints', breakpoints);
+}
 
-	document.getElementById("breakpoints").onclick =
-	function (code) {
-		var maxNumber = editor.session.getLength();
-		var minNumber = 1;
-		var breakpoints = "0";
-		while (breakpoints != null) {
-			var breakpoints = prompt("Specify the line numbers seperated by commas:");
-			if (breakpoints === null) return;
-			else if (breakpoints.includes("0") || breakpoints.includes(`${maxNumber+1}`)) {
- 				alert(`Numbers should be between 1 and ${maxNumber}`);
-			} else return;
-		}
-		status.breakpoints = true;
-		socket.emit('breakpoints', breakpoints);
-	};
+document.getElementById("save").onclick =
+function () {
+	// Get the code from the editor
+	code = editor.getValue();
+	// Tell the server to save the code
+	socket.emit('save', code);
+};
 
-	document.getElementById('run').onclick =
-	function () {
-		status.run = true;
-		if (!status.breakpoints) {
-			socket.emit('run');
-		} else {
-			socket.emit('continue');
-		}
-	};
-
-	document.getElementById('step').onclick =
-	function () {
-		socket.emit('step');
-	};
-
-	document.getElementById('stepi').onclick =
-	function () {
-		socket.emit('stepi');
-	};
-
-	document.getElementById('stop').onclick =
-	function () {
-		socket.emit('stop');
+document.getElementById("compile").onclick =
+function () {
+	if(editor.session.getLength < 1) {
+		alert("There is no code in the editor");
+	}
+	else if(editor.getValue() === code && status.ranOnce) {
+		showSnack("Code hasn't changed");
+	}
+	else {
+		showLoadingOverlay();
 		initialize();
-	};
-});
+		status.ranOnce = true;
+		disableButton("compile", true);
+		disableButton("stop", false);
+		code = editor.getValue();
+		socket.emit('compile', code);
+	}
+};
+
+document.getElementById("breakpoints").onclick =
+function (code) {
+	var breakpointsArray = editor.session.getBreakpoints();
+	for(row in breakpointsArray){
+		editor.session.addGutterDecoration(row, 'white');
+		editor.session.clearBreakpoint(row);
+	}
+	socket.emit('breakpoints', null);
+};
+
+document.getElementById('run').onclick =
+function () {
+	getBreakpoints();
+	status.run = true;
+	if (!status.breakpoints) {
+		socket.emit('run');
+	} else {
+		socket.emit('continue');
+	}
+};
+
+document.getElementById('step').onclick =
+function () {
+	getBreakpoints();
+	socket.emit('step');
+};
+
+document.getElementById('stepi').onclick =
+function () {
+	getBreakpoints();
+	socket.emit('stepi');
+};
+
+document.getElementById('stop').onclick =
+function () {
+	socket.emit('stop');
+	initialize();
+};
 
 function showSnack(text) {
 	var snackbar = document.getElementById("snackbar");
@@ -207,38 +265,29 @@ socket.on('returnCompiled', function() {
 Signal is received when a step is done or a run is finished
 */
 socket.on('returnStep', function(data, disassembly) {
-	// createWaveform(data);
-	document.getElementById('console').innerHTML = disassembly;
-	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+	displayReturn(data, disassembly);
 });
 
+/*
+Signal is received when a step is done or a run is finished
+*/
 socket.on('returnStepi', function(data, disassembly) {
-	// createWaveform(data);
-	document.getElementById('console').innerHTML = disassembly;
-	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+	displayReturn(data, disassembly);
 });
 
-// waveform = new Waveform('wave', data_cntr, null);
 /*
 Signal is received when the code execution is finished
 */
 socket.on('returnRun', function(data, disassembly) {
-console.log('run');
-	if(status.first){
-		 status.first = false;
-		 console.log('first');
-	}
-	else {
-		createWaveform(data);
-		document.getElementById('console').innerHTML = disassembly;
-		// tell the user the program finished
-	    showSnack("Program finished");
-		// disable run buttons
-		disableRunButtons(true);
-		// enable compile button
-		disableButton("compile", false);
-		// status.first = true;
-	}
+	console.log('received finish');
+	displayReturn(data, disassembly);
+	// tell the user the program finished
+    showSnack("Program finished");
+	// disable run buttons
+	disableRunButtons(true);
+	// enable compile button
+	disableButton("compile", false);
+	status.first = true;
 });
 
 /*
