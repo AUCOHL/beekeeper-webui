@@ -34,6 +34,7 @@
         <!-- jquery loading spinner -->
         <script src="libs/jquery-loading.js"></script>
         <link href="libs/jquery-loading.css" rel="stylesheet"></link>
+
     </head>
 
     <body id="body">
@@ -44,6 +45,7 @@
         <main>
             <!-- Load user saved code -->
             <script src="data/code-text.js"></script>
+            <div class="waveform-body" id="waveform-body"></div>
             <!-- Top Button toolbar -->
             <div id="toolbar" class="toolbar">
                 <button class="btn btn-primary" title="Save" id="save"> <i class="fa fa-save"></i></button>
@@ -53,19 +55,30 @@
                 <button class="btn btn-primary" title="Step" id="step"> <i class="fa fa-angle-double-right"></i></button>
                 <button class="btn btn-primary" title="Clear Breakpoints" id="breakpoints"> <i class="fa fa-bug"></i></button>
                 <button class="btn btn-primary" title="Stop" id="stop"><i class="fas fa-stop-circle"></i></button>
+                <!-- <label for="theme" style="color: #4169E1">Theme</label>
+                <select id="theme" size="1"></select> -->
+                <!-- <label for="fontsize" style="color: white">Font Size</label>
+                <select id="fontsize" size="1"> -->
+                  <option value="10px">10px</option>
+                  <option value="11px">11px</option>
+                  <option value="12px" selected="selected">12px</option>
+                  <option value="13px">13px</option>
+                  <option value="14px">14px</option>
+                  <option value="16px">16px</option>
+                  <option value="18px">18px</option>
+                  <option value="20px">20px</option>
+                  <option value="24px">24px</option>
+                </select>
             </div>
             <!-- The snackbar -->
             <div id="snackbar"></div>
             <!-- Main body section containing waveform and editor -->
             <section id="section">
                 <!-- Waveform viewer host -->
-                <div class="waveform-body" id="waveform-body"></div>
                 <!-- The ace editor host div -->
                 <div class="editor" id="editor"></div>
                 <!-- Footer to contain the disassembly -->
-                <footer id="footer">
-                    <div id="console"></div>
-                </footer>
+                <footer id="footer"><div id="console"></div></footer>
                 <script>
                     var editor = ace.edit("editor");
                 	editor.setTheme("ace/theme/twilight");

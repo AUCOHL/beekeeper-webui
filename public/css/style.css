@@ -22,6 +22,7 @@ body {
 
 /* Main Container */
 main {
+    background-color:#2C2E31;
     position: absolute;
     left: 0;
     right: 0;
@@ -33,24 +34,24 @@ main {
 #toolbar {
 	background-color: #2C2E31;
     height: 40px;
+    width: 50%;
 }
 
 section {
     position: absolute;
     top: 10;
-    /* My OCD is acting up*/
     height: 95.8%;
     left: 0;
     width: 100%;
     box-sizing: border-box;
     overflow: visible;
-    background-color: black;
+    background-color: #232323;
 }
 
-section > #waveform-body {
+#waveform-body {
     background-color: black;
     float: right;
-    /*height: 100%;*/
+    height: 100%;
     width: 50%;
     top: 0;
     bottom: 0;
@@ -58,7 +59,7 @@ section > #waveform-body {
 }
 
 /* Editor */
-section > #editor {
+#editor {
     top: 0;
     bottom: 0;
     height: 75%;
@@ -70,16 +71,18 @@ section > #editor {
 footer {
     position: absolute;
     bottom: 0;
-    left: 0;
+    left: 47px;
     height: 25%;
-    width: 50%;
+    width: 95%;
     overflow: auto;
-    background: black;
+    background: #2F4F4F;
 }
 
 #console {
     display: block;
-    color: green;
+    color: white;
+    align-content: space-around;
+    padding-left: 20px;
 }
 
 #snackbar {
@@ -140,31 +143,13 @@ footer {
     cursor: pointer;
 }
 
-.ace_gutter-
 .ace_gutter.ace_breakpoint:before{
-	/*border-radius: 20px 20px 20px 20px;
-	box-shadow: 0px 0px 1px 1px red inset;*/
-    /*-webkit-border-radius:8px;
-    -moz-border-radius:8px;
-    border-radius:8px;
-    border:1px solid red;
-    width:8px;
-    height:8px;*/
     content: '\2666';
     color: red;
     float: left;
 }
 
 .ace_gutter-cell.ace_breakpoint{
-	/*-webkit-border-radius:8px;
-    -moz-border-radius:8px;
-    border-radius:8px;
-    border:1px solid red;
-    width:8px;
-    height:8px;*/
-    /*content: '\2666';
-    color: red;*/
-
     width: 5px;
     height: 5px;
     background: red;
@@ -179,62 +164,6 @@ footer {
 
 .white {
     color: white;
-}
-
-.listBP{
-    overflow: auto;
-    position: relative;
-    cursor: default;
-    color: @breakpoint-list-color;
-    height: @breakpoint-list-item-height
-}
-.listBP .tree-headings{
-    display: none;
-}
-
-.listBP .bpItem{
-    padding: 5px;
-    position: relative;
-    border-bottom: 1px solid 1px;
-    border-top: 1px solid 1px;
-    box-sizing: border-box;
-    height: 20px;
-}
-
-.listBP .content{
-    cursor : pointer;
-    font-family : @breakpoint-list-font-family;
-    font-size : @breakpoint-list-font-size;
-    padding : @breakpoint-list-item-padding;
-}
-
-.listBP .content div{
-    font-family: Ubuntu Mono, Menlo, Consolas, monospace;
-    padding: 3px 0 0 0;
-    font-size: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    color: @breakpoint-list-code-color;
-    text-overflow: ellipsis;
-}
-
-.listBP .checkbox {
-    width      : @breakpoint-list-checkbox-width;
-    height     : @breakpoint-list-checkbox-height;
-    .image-2x("images/@{breakpoint-list-checkbox-image}", @breakpoint-list-checkbox-image-width, @breakpoint-list-checkbox-image-height);
-    background-position: 0 0;
-    display : block;
-    position : absolute;
-    left : @breakpoint-list-checkbox-left;
-    top : @breakpoint-list-checkbox-top;
-}
-
-.listBP .checked .checkbox {
-    background-position: 0 (-3 * @breakpoint-list-checkbox-height);
-}
-
-.listBPDisabled .bpItem {
-    opacity : 0.5
 }
 
 @-webkit-keyframes fadein {

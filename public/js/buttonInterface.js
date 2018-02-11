@@ -1,32 +1,25 @@
 // The port used for the app is 9000
 var socket = io.connect('http://localhost:9000');
-// Keep track of whether we're running or stepping
-var run = false;
 // Change this value if you want the snackbar to appear longer or shorter
 var snackbarTime = 3000;
 var waveform;
-var status = {
-	compiled: false,
-	run: false,
-	// Keep track of whether beekeeper will stop for breakpoints
-	breakpoints: false,
-	ranOnce: false,
-	first: true
-}
+var compiled = false;
+var run= false;
+var breakpointsSet= false;
+var ranOnce= false;
 
 initialize();
+initializeAce();
 
 // As the app starts, disable all buttons except save and compile
 function initialize() {
-	initializeAce();
-	$("#footer").addClass('hidden');
+	console.log('initializing');
+	compiled = false;
+	run = false;
+	breakPointsSet = false;
+	ranOnce = false;
 	document.getElementById('console').innerHTML = "";
 	document.getElementById('waveform-body').innerHTML = "";
-	status.compiled = false;
-	status.run = false;
-	status.breakpoints = false;
-	status.first = true;
-	status.ranOnce = false;
 	disableAllButtons(true);
 	disableButton("save", false);
 	disableButton("compile", false);
@@ -34,6 +27,7 @@ function initialize() {
 	document.getElementById('waveform-body').style.visibility = 'hidden';
 	document.getElementById('editor').style.width = '100%';
 	document.getElementById('editor').style.height = '100%';
+	document.getElementById('section').style.width = '100%';
 }
 
 function initializeAce() {
@@ -100,20 +94,6 @@ function disableButton(id, state) {
 }
 
 /*
-Determine if the run has breakpoint or not
-If both running and there are breakpoints tell the user to either step or view waveform
-Then disable run button
-*/
-function breakpointRun() {
-	if (run && breakpoints) {
-		showSnack("You can either step or view waveform now");
-		disableButton("run", true);
-		return true;
-	}
-	return false;
-}
-
-/*
 Display loading spinner
 Change section to body if you want to cover the whole page
 */
@@ -144,8 +124,8 @@ function createWaveform(data) {
 function displayReturn(data, disassembly) {
 	document.getElementById('footer').style.visibility = 'visible';
 	document.getElementById('waveform-body').style.visibility = 'visible';
-	document.getElementById('editor').style.width = '50%';
 	document.getElementById('editor').style.height = '75%';
+	document.getElementById('section').style.width = '50%';
 	createWaveform(data);
 	document.getElementById('console').innerHTML = disassembly;
 	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
@@ -156,6 +136,7 @@ function displayReturn(data, disassembly) {
 * And length returns double the actual length!
 */
 function getBreakpoints () {
+	breakPointsSet = true;
 	var array = editor.session.getBreakpoints();
 	var breakpoints = [];
 	for (var key in array) {
@@ -179,13 +160,13 @@ function () {
 	if(editor.session.getLength < 1) {
 		alert("There is no code in the editor");
 	}
-	else if(editor.getValue() === code && status.ranOnce) {
+	else if(editor.getValue() === code && ranOnce) {
 		showSnack("Code hasn't changed");
 	}
 	else {
 		showLoadingOverlay();
 		initialize();
-		status.ranOnce = true;
+		ranOnce = true;
 		disableButton("compile", true);
 		disableButton("stop", false);
 		code = editor.getValue();
@@ -195,6 +176,7 @@ function () {
 
 document.getElementById("breakpoints").onclick =
 function (code) {
+	breakPointsSet = false;
 	var breakpointsArray = editor.session.getBreakpoints();
 	for(row in breakpointsArray){
 		editor.session.addGutterDecoration(row, 'white');
@@ -205,9 +187,9 @@ function (code) {
 
 document.getElementById('run').onclick =
 function () {
-	getBreakpoints();
-	status.run = true;
-	if (!status.breakpoints) {
+	run = true;
+	if (!breakPointsSet) {
+		getBreakpoints();
 		socket.emit('run');
 	} else {
 		socket.emit('continue');
@@ -252,7 +234,7 @@ Signal finishedCompilation is received when compiling code is complete
 */
 socket.on('returnCompiled', function() {
 	// Set the compiled flag to true
-	status.compiled = true;
+	compiled = true;
 	// hide the overlay displayed by compile button click
 	hideLoadingOverlay();
 	// Tell the user the code compiled
@@ -265,6 +247,7 @@ socket.on('returnCompiled', function() {
 Signal is received when a step is done or a run is finished
 */
 socket.on('returnStep', function(data, disassembly) {
+	console.log('returnStep');
 	displayReturn(data, disassembly);
 });
 
@@ -272,6 +255,7 @@ socket.on('returnStep', function(data, disassembly) {
 Signal is received when a step is done or a run is finished
 */
 socket.on('returnStepi', function(data, disassembly) {
+	console.log('returnStepi');
 	displayReturn(data, disassembly);
 });
 
@@ -279,7 +263,7 @@ socket.on('returnStepi', function(data, disassembly) {
 Signal is received when the code execution is finished
 */
 socket.on('returnRun', function(data, disassembly) {
-	console.log('received finish');
+	console.log('returnRun');
 	displayReturn(data, disassembly);
 	// tell the user the program finished
     showSnack("Program finished");
@@ -287,13 +271,19 @@ socket.on('returnRun', function(data, disassembly) {
 	disableRunButtons(true);
 	// enable compile button
 	disableButton("compile", false);
-	status.first = true;
+});
+
+socket.on('returnBreak', function(data, disassembly) {
+	console.log('returnBreak');
+	showSnack("Breaking");
+	displayReturn(data, disassembly);
 });
 
 /*
 Signal is received when beekeeper is killed
 */
 socket.on('returnStop', function() {
+	console.log('returnStop');
 	showSnack("Beekeeper Killed");
 	initialize();
 });

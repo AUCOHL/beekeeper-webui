@@ -97,8 +97,17 @@ Monitor runningFinished state value for switch.
 Only release finishRun() if the value changes.
 */
 AsyncWatch(state, 'runningFinished', function(oldValue, newValue){
+	// var finish = (function() {
+	// 	var executed = false;
+	// 	return function() {
+	// 		if (!executed) {
+	// 			executed = true;
+	// 			state['runningFinished'] = true;
+	// 			console.log('called');
+	// 		}
+	// 	};
+	// })();
 	if (newValue !== oldValue && !newValue) {
-		// console.log('emitting');
 		eventEmitter.emit('runFinished');
 	}
 });
@@ -112,6 +121,9 @@ AsyncWatch(procData, 'vcdDump', function(oldValue, newValue){
 	}
 	else if (state.stepi) {
 		socket.emit('returnStepi', procData.vcdDump, procData.parsedDisassembly);
+	}
+	else if (!state.runningFinished && state.breakPointsSet) {
+		socket.emit('returnBreak', procData.vcdDump, procData.parsedDisassembly);
 	}
 });
 
@@ -292,55 +304,37 @@ This is where all the interaction with the beekeeper process takes place
 function setBeekeeperDataStream() {
 	procData.proc.stdout.on('data', (data) => {
 		global.data = data;
+		global.detected = false;
 		// convert data object to string
 		data = "" + data;
 		if (data.includes('Invalid input')) {
 			socket.emit('message', `Sorry, you can't do that!`);
 		}
 		else if (data.includes('JAL zero, 0')) {
-			state['runningFinished'] = true;
+			if (!detected) {
+				procData.parsedDisassembly += data;
+				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)/g, '<br/>');
+				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(JAL zero, 0)/g, "<br/>");
+				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(<br\/>){2,}/g, "<br/>");
+				procData.proc.stdout.pause();
+				detected = true;
+				state['runningFinished'] = true;
+			}
 		}
-		else if (data.includes('initialized') || data.includes('beekeeper') || data.includes('path') || data.includes('Running')) {}
+		else if (data.includes('Memory') || data.includes('VCD') || data.includes('Targetting') || data.includes('Program') || data.includes('Breakpoint') || data.includes('Running')) {}
+		else if (data.includes('beekeeper')) {
+			// if (!state.breakPointsSet) {}
+			// else {
+				procData.parsedDisassembly += data;
+				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(\[.*\]\s)/g, "");
+				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)/g, '<br/>');
+				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(\(beekeeper\)\s)/g, "<br/>");
+				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(<br\/>){2,}/g, "<br/>");
+			// }
+		}
 		else {
 			procData.parsedDisassembly += data;
-			procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)/g, '<br/>');;
-			// get instructions
-			var instruction = procData.processData.substring(0, procData.processData.indexOf("["));
-			// get instruction address
-			var address = procData.processData.substring(procData.processData.indexOf("["), procData.processData.indexOf("]"));
-			// cleanup address
-			if (address.indexOf(userData.codeFileName) > -1) {
-				// get instruction line number
-				state.steps = parseInt(address.substring(address.indexOf(`${userData.codeFileName}:`) + `${userData.codeFileName}:`.length, address.indexOf(' ')));
-				// get instruction address
-				address = "[" + address.substring(address.indexOf(' ') + 1, address.length) + "]";
-			}
-			var lines = code.split('\n');
-			// get the code line
-			// TODO improve the loop
-			for(var i = 0;i < lines.length;i++){
-				if (state.steps == i) procData.codeLine = lines[i];
-			};
-			// grab the instruction op
-			var instructionSet = instruction.match(/[A-Z]+.*?,/g);
-			// grab the instruction arguments
-			var argumentSet = instruction.match(/(,[^A-Z]*)/g);
-			var instructions = [];
-			if (instructionSet != null) {
-				for (var iterator = 0; iterator < instructionSet.length; iterator++) {
-					instructions.push(instructionSet[iterator] + argumentSet[iterator].substring(1, argumentSet[iterator].length) + "<br/>")
-				}
-			}
-			// create console text
-			var text = "";
-			if (instructions != null) {
-				// line of code first, followed by address
-				text = text + procData.codeLine + "<br/>" + address + "<br/>";
-				// append instructions to text
-				for (var iterator = 0; iterator < instructions.length; iterator++) {
-					text = text + instructions[iterator];
-				}
-			}
+			procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)/g, '<br/>');
 			storeVCD();
 		}
 	});
@@ -372,13 +366,17 @@ io.on("connection", function (socket) {
 	// Run signal received when run button is pressed
 	socket.on('run', function(code) {
 		state.run = true;
-		if (state.step || state.stepi) procData.proc.stdin.write('continue\n');
-		else procData.proc.stdin.write('run\n');
+		procData.proc.stdin.write('run\n');
+	});
+
+	socket.on('continue', function(code) {
+		procData.proc.stdin.write('continue\n');
 	});
 
 	// Breakpoints signal received when running
 	socket.on('breakpoints', function(breakpoints) {
 		// If breakpoints are 0 then they're at default and no points were set
+		// console.log(breakpoints);
 		if (breakpoints === null) {
 			state.breakPointsSet = false;
 			for (var i = 0; i < procData.breakPointsArray.length; i++) {
@@ -389,8 +387,9 @@ io.on("connection", function (socket) {
 		if (breakpoints != null && breakpoints.length > 0) {
 			state.breakPointsSet = true;
 			for (var i = 0; i < breakpoints.length; i++) {
-				procData.breakPointsArray.push(i);
-				procData.proc.stdin.write(`break ${userData.codeCFile}:${i}\n`);
+				procData.breakPointsArray.push(breakpoints[i]);
+				procData.proc.stdin.write(`break ${userData.codeCFile}:${breakpoints[i]}\n`);
+				// console.log(`break ${userData.codeCFile}:${breakpoints[i]}\n`);
 			}
 		}
 	});

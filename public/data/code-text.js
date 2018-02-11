@@ -1,10 +1,10 @@
 var code=`int main() {
-    int a = 2220;
-    int b = 3202;
-    int m = 70;
-    int d = a+b;
+    int a = 222220;
+    int b = 3232202;
+    int m = 73203;
+    int d = a+m+b;
     int x = d+m;
-    int c = 1;
+    int c = 15;
     return 0;
 }
 `;
