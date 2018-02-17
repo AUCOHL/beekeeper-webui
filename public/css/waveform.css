@@ -49,8 +49,8 @@
 
 .canvas-viewport {
     position: absolute;
-    max-height: 90%;
+    max-height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    outline: none
+    outline: none;
 }

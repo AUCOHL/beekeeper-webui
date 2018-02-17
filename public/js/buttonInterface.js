@@ -7,6 +7,9 @@ var compiled = false;
 var run= false;
 var breakpointsSet= false;
 var ranOnce= false;
+var firstStep = true;
+var marker;
+var Range = ace.require('ace/range').Range;
 
 initialize();
 initializeAce();
@@ -14,10 +17,12 @@ initializeAce();
 // As the app starts, disable all buttons except save and compile
 function initialize() {
 	console.log('initializing');
+	editor.session.removeMarker(marker);
 	compiled = false;
 	run = false;
 	breakPointsSet = false;
 	ranOnce = false;
+	firstStep = true;
 	document.getElementById('console').innerHTML = "";
 	document.getElementById('waveform-body').innerHTML = "";
 	disableAllButtons(true);
@@ -28,10 +33,12 @@ function initialize() {
 	document.getElementById('editor').style.width = '100%';
 	document.getElementById('editor').style.height = '100%';
 	document.getElementById('section').style.width = '100%';
+	var Range = ace.require('ace/range').Range;
+	editor.session.addMarker(new Range(0, 0, 0, 1), "myMarker", "fullLine");
 }
 
 function initializeAce() {
-	editor.setValue(`${code}`);
+	editor.setValue(`${code}`, -1);
 	editor.renderer.setShowGutter(true);
 	decorateAce(editor);
 }
@@ -202,10 +209,22 @@ function () {
 	socket.emit('step');
 };
 
+/*
+*	This function checks if the step is the first step
+*	If first step, emit stepi twice
+*	If not, emit stepi once
+*	The reason for this is that the way beekeeper works, the first stepi just
+		outputs "Running instruction by instruction" and does nothing
+*
+*/
 document.getElementById('stepi').onclick =
 function () {
 	getBreakpoints();
-	socket.emit('stepi');
+	if (firstStep) {
+		firstStep = false;
+		socket.emit('stepi');
+		socket.emit('stepi');
+	} else socket.emit('stepi');
 };
 
 document.getElementById('stop').onclick =
@@ -246,17 +265,23 @@ socket.on('returnCompiled', function() {
 /*
 Signal is received when a step is done or a run is finished
 */
-socket.on('returnStep', function(data, disassembly) {
-	console.log('returnStep');
+socket.on('returnStep', function(data, disassembly, lineNumber) {
+	editor.session.removeMarker(marker);
+	console.log('returnStep ' + lineNumber);
 	displayReturn(data, disassembly);
+	if (lineNumber >= 0)
+	marker = editor.session.addMarker(new Range(lineNumber, 0, lineNumber, 1), "ace-highlight", "fullLine");
 });
 
 /*
 Signal is received when a step is done or a run is finished
 */
-socket.on('returnStepi', function(data, disassembly) {
-	console.log('returnStepi');
+socket.on('returnStepi', function(data, disassembly, lineNumber) {
+	editor.session.removeMarker(marker);
+	console.log('returnStepi ' + lineNumber);
 	displayReturn(data, disassembly);
+	if (lineNumber >= 0)
+	marker = editor.session.addMarker(new Range(lineNumber, 0, lineNumber, 1), "ace-highlight", "fullLine");
 });
 
 /*
@@ -273,6 +298,9 @@ socket.on('returnRun', function(data, disassembly) {
 	disableButton("compile", false);
 });
 
+/*
+* Signal is received when the beekeeper encounters breakpoint
+*/
 socket.on('returnBreak', function(data, disassembly) {
 	console.log('returnBreak');
 	showSnack("Breaking");
