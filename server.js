@@ -46,7 +46,8 @@ var state = {
 	// Keep track of whether or not the run has finished
 	runningFinished: false,
 	// Whether or not there are breakpoints
-	breakPointsSet: false
+	breakPointsSet: false,
+	breaking: false
 };
 
 var beekeeperData = {
@@ -129,7 +130,7 @@ AsyncWatch(procData, 'vcdDump', function(oldValue, newValue){
 	else if (state.stepi) {
 		socket.emit('returnStepi', procData.vcdDump, procData.parsedDisassembly, state.currentLine);
 	}
-	else if (!state.runningFinished && state.breakPointsSet) {
+	else if (!state.runningFinished && state.breakPointsSet && state.breaking) {
 		socket.emit('returnBreak', procData.vcdDump, procData.parsedDisassembly);
 	}
 });
@@ -222,11 +223,12 @@ function compileCode(code) {
 	state['run'] = false;
 	state['step'] = false;
 	state['stepi'] = false;
+	state['breaking'] = false;
 	procData['processData'] = "";
 	procData['parsedDisassembly'] = "";
-	saveCode(code);
+	storeFile(userData.codeCFile, code);
+	storeFile(userData.codeTextFile, "var code=`" + code + "`;");
 	global.code = code;
-	//
 	exec (`${beekeeperData.ccPath} ${userData.codeCFile}`, (error1, stdout1, stderr1) => {
 		if (error1 || stderr1) {
 			console.error(`cc failed: ${error1}.`);
@@ -323,7 +325,8 @@ function setBeekeeperDataStream() {
 				detected = true;
 				procData.parsedDisassembly += data;
 				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)/g, '<br/>');
-				procData.parsedDisassembly = procData.parsedDisassembly.replace(/\[.*\](?:\r\n|\r|\n)(beekeeper)(\s)(JAL zero, 0)/g, "<br/>");
+				// procData.parsedDisassembly = procData.parsedDisassembly.replace(/\[.*\](?:\r\n|\r|\n)(beekeeper)(\s)(JAL zero, 0)/g, "<br/>");
+				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(beekeeper)/g, "");
 				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(JAL zero, 0)/g, "<br/>");
 				procData.parsedDisassembly = procData.parsedDisassembly.replace(/(<br\/>){2,}/g, "<br/>");
 				state['runningFinished'] = true;
@@ -332,7 +335,6 @@ function setBeekeeperDataStream() {
 			procData.proc.stdin.pause();
 			procData.proc.kill();
 		}
-		else if (data.includes('Memory') || data.includes('VCD') || data.includes('Targetting') || data.includes('Program') || data.includes('Breakpoint')) {}
 		else if (data.includes('Running')) {
 			procData.parsedDisassembly += data;
 			if (state.stepi) {
@@ -345,20 +347,27 @@ function setBeekeeperDataStream() {
 			}
 			storeVCD();
 		}
+		else if (data.includes('Memory') || data.includes('VCD') || data.includes('Targetting') || data.includes('Program')) {}
+		else if (data.includes('Breakpoint') && !data.includes(',')) {
+			state.breaking = true;
+			procData.parsedDisassembly += data;
+			procData.parsedDisassembly = procData.parsedDisassembly.replace(/(\[.*\])(?:\r\n|\r|\n)(\(beekeeper\)\s)(.*)/g, "");
+			procData.parsedDisassembly = procData.parsedDisassembly.replace(/(Breakpoint set at)\s(.*)/g, "");
+		}
 		// If beekeeper is included in output data stream , beekeeper is stepping
-		else if (data.includes('beekeeper')) {
+		else if (data.includes('beekeeper') && !data.includes('Breakpoint')) {
 			if (state.step || state.stepi) {
 				procData.parsedDisassembly += data;
 				if (state.step) {
 					procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)(\(beekeeper\)\s)/g, " : <br/>");
-
 				} else if (state.stepi) {
 					procData.parsedDisassembly = procData.parsedDisassembly.replace(/(?:\r\n|\r|\n)(\(beekeeper\)\s)/g, " : ");
 				}
 				// The filename is only included if beekeeper is moving to a new line
 				if (data.includes(`${userData.codeCFile}`)) {
 					procData.parsedDisassembly = procData.parsedDisassembly.replace(/(code.c:)([1-9]+)(\s0x)/g, "0x");
-					state.currentLine = parseInt(data.substring(data.indexOf(`${userData.codeCFile}`) + userData.codeCFile.length + 1, data.indexOf("0x")));
+					state.currentLine = parseInt(data.substring(data.indexOf(`${userData.codeCFile}`) + userData.codeCFile.length + 1, data.indexOf("0x"))) - 1;
+					if (state.currentLine < 0) state.currentLine = 0;
 				}
 			}
 			// If not stepping clean up the data by removing addresses and '(beekeeper)'

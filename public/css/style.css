@@ -78,7 +78,7 @@ section {
 footer {
     position: absolute;
     bottom: 10px;
-    left: 47px;
+    left: 40px;
     height: 25%;
     width: 95%;
     overflow: auto;
@@ -89,6 +89,7 @@ footer {
     display: block;
     color: white;
     align-content: space-around;
+    padding-top: 20px;
     padding-left: 20px;
     padding-bottom: 20px;
 	font-family: monospace;

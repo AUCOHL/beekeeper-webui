@@ -135,7 +135,10 @@ function displayReturn(data, disassembly) {
 	document.getElementById('section').style.width = '50%';
 	createWaveform(data);
 	document.getElementById('console').innerHTML = disassembly;
-	document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+	if (!run) {
+		document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+		document.getElementById('footer').scrollTop = document.getElementById('footer').scrollHeight;
+	}
 }
 
 /*
@@ -171,8 +174,8 @@ function () {
 		showSnack("Code hasn't changed");
 	}
 	else {
-		showLoadingOverlay();
 		initialize();
+		showLoadingOverlay();
 		ranOnce = true;
 		disableButton("compile", true);
 		disableButton("stop", false);
@@ -205,6 +208,7 @@ function () {
 
 document.getElementById('step').onclick =
 function () {
+	run = false;
 	getBreakpoints();
 	socket.emit('step');
 };
@@ -219,6 +223,7 @@ function () {
 */
 document.getElementById('stepi').onclick =
 function () {
+	run = false;
 	getBreakpoints();
 	if (firstStep) {
 		firstStep = false;
@@ -282,6 +287,8 @@ socket.on('returnStepi', function(data, disassembly, lineNumber) {
 	displayReturn(data, disassembly);
 	if (lineNumber >= 0)
 	marker = editor.session.addMarker(new Range(lineNumber, 0, lineNumber, 1), "ace-highlight", "fullLine");
+	else
+	marker = editor.session.addMarker(new Range(0, 0, 0, 1), "ace-highlight", "fullLine");
 });
 
 /*
