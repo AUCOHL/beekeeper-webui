@@ -1,11 +1,36 @@
-code.c*
-code.c.bin_dump
+# Intermediate session files
 webui
-dump.vcd
-soc.json
 public/data/waveform-text.js
 public/data/waveform-data.js
 public/data/code.c.verilog.txt
 public/data/code.c.bin_dump
 public/data/code.c
+
+# Beekeeper output files
+code.c.bin_dump
+code.c*
+dump.vcd
+soc.json
+
+# IDEA cache
 .idea
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Output of 'npm pack'
+*.tgz
+
+# dotenv environment variables file
+.env

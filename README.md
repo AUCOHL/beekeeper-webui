@@ -12,10 +12,9 @@ You will need to make and install Verilog::VCD
 ## Program Dependencies
     sudo apt install iverilog dos2unix npm
 ## Module Dependencies
-    npm install -g socket.io node-getopt
+    npm install
 
 # Usage
-	cd <project-root-directory>
-	node socket.js
+	node server.js
 
-Open Index.html in folder public, that's it, go ahead.
+public/Index.html is the server endpoint.

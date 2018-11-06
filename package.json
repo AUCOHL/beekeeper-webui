@@ -1,0 +1,28 @@
+{
+  "name": "beekeeper-webui",
+  "version": "0.6.8",
+  "description": "Web UI for project beekeeper. Using nodejs to serve a shell for beekeeper on the server. Includes clien-side UI which is independent from the shell server.",
+  "main": "server.js",
+  "dependencies": {
+    "node-getopt": "^0.3.2",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cloud-V/beekeeper-webui.git"
+  },
+  "keywords": [
+    "beekeeper"
+  ],
+  "author": "Cloud-V Team",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Cloud-V/beekeeper-webui/issues"
+  },
+  "homepage": "https://github.com/Cloud-V/beekeeper-webui#readme"
+}
